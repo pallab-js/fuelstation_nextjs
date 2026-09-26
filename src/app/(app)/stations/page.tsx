@@ -11,6 +11,7 @@ import { EmptyState, ProgressBar, Skeleton } from "@/components/ui/misc";
 import { StatCard } from "@/components/ui/stat-card";
 import { StoneCard } from "@/components/ui/card";
 import { queryStationCards, queryStationDetail, type StationDetailData } from "@/lib/repo/queries";
+import { RequireRole } from "@/components/auth/require-role";
 import { useLive } from "@/lib/hooks/use-live";
 import { date, dateTime, litres, money, moneyShort, pct, relative, time } from "@/lib/domain/format";
 import { useSession } from "@/lib/session/session-store";
@@ -277,8 +278,11 @@ function StationsInner() {
 
 export default function StationsPage() {
   return (
+    <RequireRole roles={["manager", "owner"]} description="The outlet network view is limited to managers and owners.">
+  return (
     <Suspense fallback={<Skeleton className="h-96" />}>
       <StationsInner />
     </Suspense>
+  </RequireRole>
   );
 }

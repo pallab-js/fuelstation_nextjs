@@ -86,7 +86,8 @@ seam where a future sync/HTTP backend can be inserted without touching UI code.
 
 ## 7. Security & integrity (prototype scope)
 
-- PINs stored as salted SHA-256 (WebCrypto), never plaintext; PIN is local convenience,
+- PINs stored as salted PBKDF2-SHA256, 100k iterations (WebCrypto), never plaintext;
+  PIN is local convenience,
   explicitly **not** a security boundary (documented in README).
 - zod validation at repo boundary prevents malformed records.
 - All money/litres stored as **integers** (paise / millilitres) → no float drift.

@@ -41,7 +41,7 @@ Customer ──< CreditAccount ──< Vehicle
 | `manager` | its `stationId` (or all if network manager), ops + reports |
 | `attendant` | its `stationId`, POS + own shift only |
 
-`pinSalt`, `pinHash` (SHA-256 hex, WebCrypto), `phone`.
+`pinSalt`, `pinHash` (PBKDF2-SHA256 100k iters, WebCrypto), `phone`.
 
 ### `fuelProducts` — `id, code, name`
 `unitPricePaise`, `priceHistory: {ts, unitPricePaise}[]`, `color` (chart series),

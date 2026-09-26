@@ -3,7 +3,7 @@
 import { useEffect, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { BootstrapProvider, useBootstrap } from "@/lib/hooks/use-bootstrap";
-import { useSession } from "@/lib/session/session-store";
+import { SESSION_TTL_MS, useSession } from "@/lib/session/session-store";
 import { ToastViewport, toast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
 
@@ -54,16 +54,42 @@ function Gate({ children }: { children: ReactNode }) {
 /* ------------------------------ auth guard ------------------------------- */
 
 function AuthGuard({ children }: { children: ReactNode }) {
-  const { hydrated, profileId } = useSession();
+  const { hydrated, profileId, lastActiveTs, touch, signOut } = useSession();
   const rawPath = usePathname();
   const pathname = rawPath !== "/" ? rawPath.replace(/\/+$/, "") : "/";
   const router = useRouter();
+
+  // routing counts as user activity; also backfills lastActiveTs for
+  // sessions persisted before the idle timeout existed
+  useEffect(() => {
+    if (!hydrated || !profileId) return;
+    if (lastActiveTs == null) touch();
+    else if (Date.now() - lastActiveTs >= SESSION_TTL_MS) signOut();
+    else touch();
+  }, [hydrated, profileId, pathname, lastActiveTs, touch, signOut]);
 
   useEffect(() => {
     if (!hydrated) return;
     if (!profileId && pathname !== "/login") router.replace("/login");
     if (profileId && pathname === "/login") router.replace("/dashboard");
   }, [hydrated, profileId, pathname, router]);
+
+  // L4: idle timeout — input activity marks the session, inactivity expires it
+  useEffect(() => {
+    if (!hydrated || !profileId) return;
+    const mark = () => touch();
+    window.addEventListener("pointerdown", mark, { passive: true });
+    window.addEventListener("keydown", mark);
+    const check = window.setInterval(() => {
+      const ts = useSession.getState().lastActiveTs;
+      if (ts != null && Date.now() - ts >= SESSION_TTL_MS) useSession.getState().signOut();
+    }, 30_000);
+    return () => {
+      window.removeEventListener("pointerdown", mark);
+      window.removeEventListener("keydown", mark);
+      window.clearInterval(check);
+    };
+  }, [hydrated, profileId, touch]);
 
   if (!hydrated || (!profileId && pathname !== "/login")) {
     return (

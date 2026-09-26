@@ -74,6 +74,11 @@ self.addEventListener("activate", (event) => {
   );
 });
 
+/** Exact match first; fall back to ignoring ?query (RSC ?_rsc / ?id= URLs). */
+async function matchCache(cache, request) {
+  return (await cache.match(request)) || (await cache.match(request, { ignoreSearch: true }));
+}
+
 async function networkFirst(request) {
   const cache = await caches.open(CACHE);
   try {
@@ -81,14 +86,17 @@ async function networkFirst(request) {
     if (res && res.ok) cache.put(request, res.clone());
     return res;
   } catch {
-    const cached = (await cache.match(request)) || (await cache.match(BASE + "/offline/")) || (await cache.match(BASE + "/"));
+    const cached =
+      (await matchCache(cache, request)) ||
+      (await cache.match(BASE + "/offline/")) ||
+      (await cache.match(BASE + "/"));
     if (cached) return cached;
     return new Response("You are offline", { status: 503, headers: { "Content-Type": "text/plain" } });
   }
 }
 
 async function cacheFirst(request) {
-  const cached = await caches.match(request);
+  const cached = await matchCache(caches, request);
   if (cached) return cached;
   const res = await fetch(request);
   if (res && res.ok) {
@@ -100,14 +108,18 @@ async function cacheFirst(request) {
 
 async function staleWhileRevalidate(request) {
   const cache = await caches.open(CACHE);
-  const cached = await cache.match(request);
+  const cached = await matchCache(cache, request);
   const network = fetch(request)
     .then((res) => {
       if (res && res.ok) cache.put(request, res.clone());
       return res;
     })
     .catch(() => undefined);
-  return cached || (await network) || Response.error();
+  if (cached) {
+    network; // revalidate in background, ignore result
+    return cached;
+  }
+  return (await network) || Response.error();
 }
 
 self.addEventListener("fetch", (event) => {

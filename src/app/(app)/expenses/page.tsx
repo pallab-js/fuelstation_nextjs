@@ -17,6 +17,7 @@ import type { BankDeposit, Expense, ExpenseCategory } from "@/lib/db/types";
 import { date, dateTime, money, moneyShort } from "@/lib/domain/format";
 import { DomainError } from "@/lib/repo/common";
 import { addDeposit, addExpense } from "@/lib/repo/ops";
+import { RequireRole } from "@/components/auth/require-role";
 import { useLive } from "@/lib/hooks/use-live";
 import { scopeMatches, useSession } from "@/lib/session/session-store";
 
@@ -35,7 +36,7 @@ function monthKey(ts: number): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 }
 
-export default function ExpensesPage() {
+function ExpensesPage() {
   const scope = useSession((s) => s.scope);
   const profileId = useSession((s) => s.profileId);
   const homeStationId = useSession((s) => s.homeStationId);
@@ -317,5 +318,16 @@ export default function ExpensesPage() {
         <p className="mono-label mt-4 text-muted">Last deposit {filteredDeposits[0] ? dateTime(filteredDeposits[0].ts) : "never"}</p>
       </Dialog>
     </div>
+  );
+}
+
+export default function ExpensesPageGuarded() {
+  return (
+    <RequireRole
+      roles={["owner", "manager"]}
+      description="Expenses and bank deposits are limited to owners and managers."
+    >
+      <ExpensesPage />
+    </RequireRole>
   );
 }

@@ -31,7 +31,7 @@ export const NAV: NavItem[] = [
   { href: "/inventory", label: "Inventory", icon: Warehouse, minRole: "attendant", showInPalette: true },
   { href: "/credit", label: "Credit", icon: Users, minRole: "manager", showInPalette: true },
   { href: "/expenses", label: "Expenses", icon: Receipt, minRole: "manager", showInPalette: true },
-  { href: "/reports", label: "Reports", icon: FileText, minRole: "manager", showInPalette: true },
+  { href: "/reports", label: "Reports", icon: FileText, minRole: "attendant", showInPalette: true },
   { href: "/alerts", label: "Alerts", icon: Bell, minRole: "attendant", showInPalette: true },
   { href: "/settings", label: "Settings", icon: Settings, minRole: "owner", showInPalette: true },
 ];

@@ -16,6 +16,7 @@ import { date, money, moneyShort, relative } from "@/lib/domain/format";
 import { DomainError } from "@/lib/repo/common";
 import { adjustCredit, recordPayment, updateCreditLimit } from "@/lib/repo/ops";
 import { queryCredit, queryCustomerLedger, type CreditRow } from "@/lib/repo/queries";
+import { RequireRole } from "@/components/auth/require-role";
 import { useLive } from "@/lib/hooks/use-live";
 import { useSession } from "@/lib/session/session-store";
 
@@ -27,7 +28,7 @@ const BUCKETS: { key: "current" | "d30" | "d60" | "d90" | "d90plus"; label: stri
   { key: "d90plus", label: "90+ d", color: "bg-error" },
 ];
 
-export default function CreditPage() {
+function CreditPage() {
   const profileId = useSession((s) => s.profileId);
   const role = useSession((s) => s.role);
   const rows = useLive<CreditRow[] | null>(() => queryCredit(), [profileId], null);
@@ -352,5 +353,16 @@ export default function CreditPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function CreditPageGuarded() {
+  return (
+    <RequireRole
+      roles={["owner", "manager"]}
+      description="Credit and fleet ledgers are limited to owners and managers."
+    >
+      <CreditPage />
+    </RequireRole>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Delete } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { useLive } from "@/lib/hooks/use-live";
@@ -15,6 +15,7 @@ export default function LoginPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [pin, setPin] = useState("");
   const [busy, setBusy] = useState(false);
+  const failedRef = useRef(0);
 
   const list = useMemo(() => allStaff.filter((s) => s.active), [allStaff]);
   const selected = useMemo(() => list.find((s) => s.id === selectedId), [list, selectedId]);
@@ -23,12 +24,21 @@ export default function LoginPage() {
     if (!selected) return;
     setBusy(true);
     try {
+      // progressive delay after repeated failures (cap 15 s)
+      const failed = failedRef.current;
+      const delay = failed >= 3 ? Math.min(15_000, 1000 * 2 ** (failed - 2)) : 0;
+      if (delay > 0) {
+        toast.error("Too many attempts", `Wait ${Math.ceil(delay / 1000)}s before trying again.`);
+        await new Promise((r) => setTimeout(r, delay));
+      }
       const ok = await verifyPin(candidate, selected.pinSalt, selected.pinHash);
       if (!ok) {
+        failedRef.current = failed + 1;
         toast.error("Wrong PIN", "Try the demo PIN shown below.");
         setPin("");
         return;
       }
+      failedRef.current = 0;
       signIn({
         id: selected.id,
         name: selected.name,
@@ -66,6 +76,8 @@ export default function LoginPage() {
                 key={s.id}
                 type="button"
                 onClick={() => {
+                  failedRef.current = 0;
+                  setPin("");
                   setSelectedId(s.id);
                   setPin("");
                 }}
@@ -154,6 +166,7 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => {
+              failedRef.current = 0;
               setSelectedId(null);
               setPin("");
             }}

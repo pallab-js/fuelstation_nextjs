@@ -24,7 +24,6 @@ import {
   setStaffPin,
   setStationStatus,
   setStationTolerance,
-  type Backup,
 } from "@/lib/repo/master";
 import { useLive } from "@/lib/hooks/use-live";
 import { useSession } from "@/lib/session/session-store";
@@ -100,7 +99,7 @@ export default function SettingsPage() {
 
   const doImport = async (file: File) => {
     try {
-      const parsed = JSON.parse(await file.text()) as Backup;
+      const parsed: unknown = JSON.parse(await file.text());
       await importBackup(parsed, profileId!);
       toast.success("Backup restored", file.name);
     } catch (e) {

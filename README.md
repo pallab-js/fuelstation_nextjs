@@ -39,7 +39,7 @@ First load seeds demo data (~8–12k rows, shown with a progress screen).
 | `npm run dev` | dev server |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm test` | Vitest (domain logic) |
+| `npm test` | Vitest (domain + repo logic) |
 | `npm run build` | static export to `out/` + service worker |
 | `npm run preview` | serve `out/` |
 
@@ -79,7 +79,8 @@ implementation plan. Design system source: `DESIGN.md`.
 ## Offline & privacy
 
 - No servers, no telemetry — data never leaves the device.
-- PINs are salted SHA-256 locally; **they are a convenience lock, not real security**.
+- PINs are stored as salted PBKDF2-SHA256 (100k iterations, WebCrypto) with login
+  attempt backoff; **they are a convenience lock, not real security**.
 - Full JSON backup/restore from Settings for portability.
 
 ## Distribution

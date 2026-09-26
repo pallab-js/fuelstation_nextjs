@@ -2,6 +2,7 @@ import { db } from "@/lib/db/dexie";
 import type { Staff, Station } from "@/lib/db/types";
 import { hashPin, randomSalt } from "@/lib/db/pin";
 import { audit, DomainError } from "./common";
+import { parseBackup } from "./backup-schema";
 
 /* -------------------------------- stations ------------------------------ */
 
@@ -90,18 +91,23 @@ export async function exportBackup(): Promise<Backup> {
   return { app: "fuelops", version: 1, exportedAt: Date.now(), tables };
 }
 
-export async function importBackup(backup: Backup, staffId: string): Promise<void> {
-  if (backup?.app !== "fuelops" || !backup.tables) throw new DomainError("Not a FuelOps backup file.");
+export async function importBackup(input: unknown, staffId: string): Promise<void> {
+  const parsed = parseBackup(input);
+  if (!parsed.ok) throw new DomainError(parsed.error);
+  // Only tables actually present in the file are replaced — a partial file
+  // must never wipe the rest of the database.
+  const backup = parsed.data;
+  const present = TABLES.filter((t) => parsed.tableNames.includes(t));
+  if (present.length === 0) throw new DomainError("Backup contains no table data.");
   await db.transaction("rw", TABLES, async () => {
-    for (const t of TABLES) {
-      const rows = (backup.tables[t] ?? []) as { id?: string; key?: string }[];
-      if (!Array.isArray(rows)) continue;
+    for (const t of present) {
+      const rows = backup.tables[t] as { id?: string }[];
       const table = db.table(t);
       await table.clear();
       if (rows.length) await table.bulkPut(rows as never[]);
     }
   });
-  await audit(staffId, "backup.import", "system", "backup", `imported ${backup.exportedAt}`);
+  await audit(staffId, "backup.import", "system", "backup", `imported ${backup.exportedAt} (${present.length} tables)`);
 }
 
 export function downloadBackup(backup: Backup): void {
@@ -109,7 +115,9 @@ export function downloadBackup(backup: Backup): void {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `fuelops-backup-${new Date(backup.exportedAt).toISOString().slice(0, 10)}.json`;
+  const when = new Date(backup.exportedAt);
+  const stamp = Number.isFinite(when.getTime()) ? when.toISOString().slice(0, 10) : "export";
+  a.download = `fuelops-backup-${stamp}.json`;
   document.body.appendChild(a);
   a.click();
   a.remove();
