@@ -291,7 +291,7 @@ function PosInner() {
                 </p>
               </div>
 
-              <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4">
+              <div className="mt-3 grid grid-cols-4 gap-2">
                 {(mode === "amount" ? ["100", "500", "1000"] : ["5", "10", "20"]).map((q) => (
                   <button
                     key={q}
@@ -310,12 +310,14 @@ function PosInner() {
                 >
                   <Delete className="mx-auto size-4" aria-hidden />
                 </button>
+              </div>
+              <div className="mt-2 grid grid-cols-3 gap-2">
                 {["7", "8", "9", "4", "5", "6", "1", "2", "3", ".", "0"].map((k) => (
                   <button
                     key={k}
                     type="button"
                     onClick={() => push(k)}
-                    className={`cursor-pointer rounded-md border border-hairline bg-white py-3 font-mono text-[18px] text-ink transition-colors hover:border-primary ${k === "." || k === "0" ? "col-span-1" : ""}`}
+                    className="cursor-pointer rounded-md border border-hairline bg-white py-3 font-mono text-[18px] text-ink transition-colors hover:border-primary"
                   >
                     {k}
                   </button>

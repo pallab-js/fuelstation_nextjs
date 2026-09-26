@@ -235,7 +235,12 @@ export default function InventoryPage() {
         ))}
 
       {tab === "dips" && (
-        <DataTable columns={dipColumns} rows={data.recentDips} rowKey={(r) => r.id} initialSort={{ key: "ts", dir: "desc" }} empty="No dips in the last 30 days" />
+        <>
+          <DataTable columns={dipColumns} rows={data.recentDips.slice(0, 50)} rowKey={(r) => r.id} initialSort={{ key: "ts", dir: "desc" }} empty="No dips in the last 30 days" />
+          {data.recentDips.length > 50 && (
+            <p className="mono-label mt-3 text-muted">Showing the 50 newest of {data.recentDips.length} dips in 30 days</p>
+          )}
+        </>
       )}
 
       {tab === "deliveries" && (

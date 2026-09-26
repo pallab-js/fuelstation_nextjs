@@ -424,8 +424,8 @@ export async function generateSeedDataset(now = Date.now(), seed = 20260926): Pr
 
       /* planted ST-09 overnight theft (last night) — drains tank to critical */
       if (d.id === "st_st09" && daysAgo === 0) {
-        const ts = day0 + 2 * HOUR;
-        if (ts <= now) events.push({ ts, rank: RANK.leak, kind: "leak", tankId: "tk_st_st09_D", ml: 6_500_000 });
+        const ts = day0 + 2 * HOUR > now ? day0 - HOUR : day0 + 2 * HOUR;
+        events.push({ ts, rank: RANK.leak, kind: "leak", tankId: "tk_st_st09_D", ml: 6_500_000 });
       }
 
       /* dips */

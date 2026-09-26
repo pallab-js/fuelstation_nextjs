@@ -194,7 +194,7 @@ function StationDetail({ id }: { id: string }) {
                   />
                   <div className="mt-1.5 flex items-center justify-between">
                     <span className="mono-label text-muted">
-                      {t.lastDipTs ? `dip ${dateTime(t.lastDipTs)}` : "no dip"}
+                      {t.lastDipTs ? `dip ${relative(t.lastDipTs)}` : "no dip"}
                     </span>
                     <span className={`mono-label ${t.variancePct && Math.abs(t.variancePct) > 0.5 ? "text-coral" : "text-muted"}`}>
                       book vs dip {t.variancePct !== undefined ? `${t.variancePct >= 0 ? "+" : ""}${t.variancePct.toFixed(2)}%` : "—"}
@@ -253,7 +253,7 @@ function StationDetail({ id }: { id: string }) {
                 <li key={r.id} className="flex items-center justify-between gap-2 py-2.5">
                   <div>
                     <p className="text-[14px] text-ink">{date(r.ts)} {time(r.ts)}</p>
-                    <p className="mono-label text-muted">{r.status.toUpperCase()}</p>
+                    <p className="mono-label text-muted">{r.status === "ok" ? "reconciled" : r.status}</p>
                   </div>
                   <Chip tone={r.status === "ok" ? "ok" : r.status === "short" ? "short" : "over"}>
                     {r.variancePaise < 0 ? "−" : "+"}₹{Math.abs(r.variancePaise / 100).toFixed(0)}
@@ -279,7 +279,6 @@ function StationsInner() {
 export default function StationsPage() {
   return (
     <RequireRole roles={["manager", "owner"]} description="The outlet network view is limited to managers and owners.">
-  return (
     <Suspense fallback={<Skeleton className="h-96" />}>
       <StationsInner />
     </Suspense>

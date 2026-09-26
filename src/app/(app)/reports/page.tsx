@@ -9,7 +9,7 @@ import { PillGroup } from "@/components/ui/pill-group";
 import { StatCard } from "@/components/ui/stat-card";
 import { db } from "@/lib/db/dexie";
 import type { FuelProduct } from "@/lib/db/types";
-import type { RangePreset } from "@/lib/domain/dates";
+import { dayKey, type RangePreset } from "@/lib/domain/dates";
 import { date, litres, money, moneyShort, pct, signedMoney } from "@/lib/domain/format";
 import { downloadCsv } from "@/lib/csv";
 import { queryCredit, queryReport, type ReportInput } from "@/lib/repo/queries";
@@ -63,7 +63,7 @@ function buildReport(
   if (id === "daily") {
     const map = new Map<string, { rev: number; ml: number; n: number; cash: number }>();
     for (const s of sales) {
-      const k = new Date(s.ts).toISOString().slice(0, 10);
+      const k = dayKey(s.ts);
       const row = map.get(k) ?? { rev: 0, ml: 0, n: 0, cash: 0 };
       row.rev += s.amountPaise;
       row.ml += s.kind === "fuel" ? (s.quantityMl ?? 0) : 0;
@@ -172,6 +172,10 @@ export default function ReportsPage() {
 
   const totals = input.sales.reduce((a, s) => a + s.amountPaise, 0);
   const totalMl = input.sales.reduce((a, s) => a + (s.kind === "fuel" ? (s.quantityMl ?? 0) : 0), 0);
+  const displayRows =
+    reportId === "daily"
+      ? report.rows.map((row) => [date(Date.parse(`${String(row[0])}T00:00:00`)), ...row.slice(1)])
+      : report.rows;
 
   return (
     <div>
@@ -245,7 +249,7 @@ export default function ReportsPage() {
             <EmptyState title="Nothing to report" description="No rows in this range and scope." />
           ) : (
             <div className="w-full overflow-x-auto rounded-md border border-card-border bg-white">
-              <table className="w-full border-collapse text-[15px]">
+              <table className="w-full border-collapse whitespace-nowrap text-[15px]">
                 <thead>
                   <tr className="border-b border-hairline">
                     {report.header.map((h, i) => (
@@ -259,7 +263,7 @@ export default function ReportsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {report.rows.map((row, ri) => (
+                  {displayRows.map((row, ri) => (
                     <tr key={ri} className="border-b border-card-border transition-colors hover:bg-pale-green/50">
                       {row.map((cell, ci) => (
                         <td

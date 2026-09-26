@@ -160,7 +160,11 @@ export async function queryDashboard(
     stations,
     kpisNow: kpis(nowSales),
     kpisPrev: kpis(prevSales),
-    trend: trend(nowSales, trendFrom, range.to),
+    trend: trend(
+      nowSales,
+      trendFrom,
+      preset === "today" ? range.to : Math.min(range.to, startOfDay(now) - 1),
+    ),
     mix: collectionsMix(nowSales),
     productMix: productMix(nowSales),
     hourly: hourlyPattern(nowSales),

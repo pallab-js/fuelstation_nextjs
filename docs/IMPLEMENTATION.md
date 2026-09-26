@@ -58,8 +58,11 @@ Phased delivery for the FuelOps prototype. Every phase ends with
 - [x] Role gating pass (owner/manager/attendant), station scope enforcement
 - [x] ⌘K palette; toasts; empty/error states; a11y sweep (focus, labels, contrast)
 - [x] Responsive sweep 375 → 1440 (375px overflow check in E2E)
-- [ ] README (screenshots, demo script, architecture diagram) ✓, CHANGELOG ✗, repo polish
-- [ ] Final gate: `npm run lint && npm run typecheck && npm test && npm run build` ✓
+- [x] README (screenshots, demo script, badges) + CHANGELOG + repo metadata (description, topics, Pages)
+- [x] UI/UX review pass: desktop + 375px screenshot audit — stations JSX text bug, POS
+      keypad grid, duplicate hourly label, mobile revenue-trend collapse, list caps,
+      date/relative consistency, ST-09 theft always in the past (see CHANGELOG 0.1.2)
+- [x] Final gate: `npm run lint && npm run typecheck && npm test && npm run build` ✓
       + airplane-mode pass ✓ (E2E offline) + Lighthouse (PWA/AA) sanity — not run
 
 ## Demo script (for showcase)

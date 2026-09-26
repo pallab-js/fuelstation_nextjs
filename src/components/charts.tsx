@@ -36,7 +36,7 @@ export function RevenueTrendChart({ points }: { points: DayPoint[] }) {
         <span className="mono-label text-muted">Revenue trend</span>
         <span className="mono-label text-muted">₹ / day</span>
       </figcaption>
-      <div className="h-52 min-h-0 flex-1">
+      <div className="min-h-52 flex-1">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data} margin={{ top: 4, right: 8, left: -14, bottom: 0 }}>
             <defs>

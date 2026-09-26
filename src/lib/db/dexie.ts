@@ -76,7 +76,7 @@ class FuelOpsDB extends Dexie {
 
 export const db = new FuelOpsDB();
 
-export const SEED_VERSION = 3;
+export const SEED_VERSION = 4;
 
 export async function isSeeded(): Promise<boolean> {
   const row = await db.settings.get("seedVersion");

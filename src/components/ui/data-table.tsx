@@ -64,7 +64,7 @@ export function DataTable<T>({
 
   return (
     <div className={cn("w-full overflow-x-auto scrollbar-slim", className)}>
-      <table className="w-full border-collapse text-[15px]">
+      <table className="w-full border-collapse whitespace-nowrap text-[15px]">
         <thead>
           <tr className="border-b border-hairline">
             {columns.map((c) => {

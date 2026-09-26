@@ -14,7 +14,7 @@ import { StatCard } from "@/components/ui/stat-card";
 import { toast } from "@/components/ui/toast";
 import { db } from "@/lib/db/dexie";
 import type { BankDeposit, Expense, ExpenseCategory } from "@/lib/db/types";
-import { date, dateTime, money, moneyShort } from "@/lib/domain/format";
+import { count, date, dateTime, money, moneyShort } from "@/lib/domain/format";
 import { DomainError } from "@/lib/repo/common";
 import { addDeposit, addExpense } from "@/lib/repo/ops";
 import { RequireRole } from "@/components/auth/require-role";
@@ -215,7 +215,12 @@ function ExpensesPage() {
         {filtered.length === 0 ? (
           <EmptyState icon={<Receipt className="size-10" strokeWidth={1.25} aria-hidden />} title="No vouchers" description="Create the first voucher to track petty cash." action={<Button onClick={openVoucher}>New voucher</Button>} />
         ) : (
-          <DataTable columns={expenseColumns} rows={filtered} rowKey={(r) => r.id} initialSort={{ key: "ts", dir: "desc" }} />
+          <>
+            <DataTable columns={expenseColumns} rows={filtered.slice(0, 50)} rowKey={(r) => r.id} initialSort={{ key: "ts", dir: "desc" }} />
+            {filtered.length > 50 && (
+              <p className="mono-label mt-3 text-muted">Showing the 50 newest of {count(filtered.length)} vouchers</p>
+            )}
+          </>
         )}
       </section>
 
@@ -224,7 +229,12 @@ function ExpensesPage() {
         {filteredDeposits.length === 0 ? (
           <EmptyState title="No deposits" description="Deposits made from the cash drawer appear here." action={<Button variant="outline" onClick={openDeposit}>Record deposit</Button>} />
         ) : (
-          <DataTable columns={depositColumns} rows={filteredDeposits} rowKey={(r) => r.id} initialSort={{ key: "ts", dir: "desc" }} />
+          <>
+            <DataTable columns={depositColumns} rows={filteredDeposits.slice(0, 50)} rowKey={(r) => r.id} initialSort={{ key: "ts", dir: "desc" }} />
+            {filteredDeposits.length > 50 && (
+              <p className="mono-label mt-3 text-muted">Showing the 50 newest of {count(filteredDeposits.length)} deposits</p>
+            )}
+          </>
         )}
       </section>
 

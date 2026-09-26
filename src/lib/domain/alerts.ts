@@ -9,6 +9,7 @@ import type {
   Station,
 } from "@/lib/db/types";
 import { balanceOf, oldestDueTs } from "./aging";
+import { date } from "./format";
 import type { TankStat } from "./tanks";
 
 export type { TankStat };
@@ -141,7 +142,7 @@ export function evaluateAlerts(input: AlertInput): Alert[] {
           r.stationId,
           r.ts,
           `Cash shortage at ${stationName(r.stationId)}`,
-          `Short by ₹${Math.abs(r.variancePaise / 100).toFixed(0)} on a shift closed ${new Date(r.ts).toLocaleDateString("en-IN")}.`,
+          `Short by ₹${Math.abs(r.variancePaise / 100).toFixed(0)} on a shift closed ${date(r.ts)}.`,
           r.ts,
         ),
       );

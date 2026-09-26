@@ -95,8 +95,7 @@ export function relative(ts: number, now = Date.now()): string {
   const h = Math.round(min / 60);
   if (h < 24) return `${h} h ago`;
   const d = Math.round(h / 24);
-  if (d < 30) return `${d} d ago`;
-  return dateShort(ts);
+  return `${d} d ago`;
 }
 
 export function receiptNo(n: number): string {

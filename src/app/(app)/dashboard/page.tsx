@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Activity, ArrowUpRight, TriangleAlert } from "lucide-react";
+import { Activity, ArrowUpRight } from "lucide-react";
 import { HourlyBars, MixDonut, RevenueTrendChart } from "@/components/charts";
 import { PageHeader } from "@/components/page-header";
 import { DataTable, type Column } from "@/components/ui/data-table";
@@ -377,10 +377,6 @@ export default function DashboardPage() {
             </ul>
           )}
           <div className="mt-5 border-t border-card-border pt-4">
-            <div className="mb-2 flex items-center justify-between">
-              <span className="mono-label text-muted">Hourly pattern</span>
-              <TriangleAlert className="size-3.5 text-muted" aria-hidden />
-            </div>
             <HourlyBars buckets={data.hourly} />
           </div>
         </section>

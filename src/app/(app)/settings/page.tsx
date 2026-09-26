@@ -316,7 +316,7 @@ export default function SettingsPage() {
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <Button variant="danger" onClick={() => setConfirmReset(true)}>
-              Reset demo data…
+              Reset demo data
             </Button>
           </div>
         </div>

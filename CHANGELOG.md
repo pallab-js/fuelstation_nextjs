@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.1.2 — 2026-09-27
+
+UI/UX review pass (desktop + 375px mobile screenshot audit).
+
+- **Stations:** removed stray `return (` that rendered as literal text on the grid and
+  detail console; reconciliation status now reads `reconciled`/`short`/`over`
+  (the mono `OK` was misread as `0K`); dip stamp shows relative time instead of the
+  wrapping full date-time.
+- **POS:** keypad restructured — quick amounts + backspace on their own 4-up row,
+  digits in a fixed 3-column grid (the shared grid scrambled rows at both breakpoints).
+- **Dashboard:** single "Hourly pattern" label (was duplicated + stray alert icon);
+  revenue trend now plots completed days only — the partial "today" bucket no longer
+  creates a misleading end-of-line cliff (KPIs still include today).
+- **Charts:** revenue-trend card renders on mobile (flex child had no floor height,
+  collapsing `ResponsiveContainer` to 0).
+- **Long lists:** vouchers, deposits and the dip log show the 50 newest rows with a
+  count footnote instead of rendering hundreds of rows.
+- **Tables:** `whitespace-nowrap` everywhere — numeric/date cells scroll horizontally
+  instead of wrapping; reports daily rows show `28 Aug 2026` (display only — CSV keeps
+  ISO keys, now bucketed by local day like the rest of the app).
+- **Consistency:** alerts meta separator (`TYPE · STATION`), alert message dates use
+  the shared `date()` formatter, credit overdue ages are always `Nd ago`, settings
+  button label no longer ends in an ellipsis.
+- **Seed:** ST-09 overnight theft always lands in the past (falls back to 23:00
+  yesterday before 02:00), so the critical scenario is live at any hour (seed v4).
+- Refreshed README screenshots; verified with the 21-check Brave smoke + visual pass.
+
 ## 0.1.1 — 2026-09-27
 
 Security hardening (external audit).

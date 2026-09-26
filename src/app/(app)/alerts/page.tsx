@@ -89,7 +89,14 @@ export default function AlertsPage() {
                 <div className="flex flex-wrap items-center gap-2">
                   <Chip tone={SEV_TONE[a.severity]}>{a.severity}</Chip>
                   <span className="mono-label uppercase text-muted">{a.type.replace(/-/g, " ")}</span>
-                  {a.stationId && <span className="mono-label text-muted">{stationName.get(a.stationId) ?? a.stationId}</span>}
+                  {a.stationId && (
+                    <>
+                      <span className="mono-label text-muted" aria-hidden>
+                        ·
+                      </span>
+                      <span className="mono-label text-muted">{stationName.get(a.stationId) ?? a.stationId}</span>
+                    </>
+                  )}
                 </div>
                 <p className="mt-1.5 text-[15px] text-ink">{a.title}</p>
                 <p className="mt-0.5 text-[14px] leading-snug text-body-muted">{a.message}</p>
