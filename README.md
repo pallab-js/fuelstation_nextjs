@@ -1,11 +1,16 @@
 # FuelOps — Multi-Outlet Fuel Station Dashboard (Prototype)
 
+[![CI](https://github.com/pallab-js/fuelstation_nextjs/actions/workflows/ci.yml/badge.svg)](https://github.com/pallab-js/fuelstation_nextjs/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Demo](https://img.shields.io/badge/demo-live%20on%20Pages-3b82f6.svg)](https://pallab-js.github.io/fuelstation_nextjs/)
+
 Local-first, offline-capable dashboard to run multiple fuel retail outlets from one
 place: network KPIs, POS, shifts & cash reconciliation, tank/wet-stock monitoring,
 credit & fleet ledgers, expenses, reports — with a professional, restrained UI.
 
 **Prototype scope:** all data lives in your browser (IndexedDB); works fully offline
 after first load; seeded with 90 days of deterministic demo data across 5 outlets.
+**[Live demo →](https://pallab-js.github.io/fuelstation_nextjs/)** (PIN `1234`).
 
 ## Screenshots
 
