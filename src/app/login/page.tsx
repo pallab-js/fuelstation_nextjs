@@ -71,7 +71,18 @@ export default function LoginPage() {
             Pick a profile — PIN gates entry, not security (demo).
           </p>
           <div className="mt-5 grid gap-2">
-            {list.map((s) => (
+            {list.length === 0
+              ? /* reserved-size skeletons: identical geometry to a profile row,
+                 so the list appearing doesn't reflow the card (CLS) */
+                Array.from({ length: 8 }, (_, i) => (
+                  <div
+                    key={`skeleton-${i}`}
+                    className="flex h-[72.5px] items-center justify-center rounded-sm border border-card-border bg-white"
+                  >
+                    {i === 0 && <p className="text-[14px] text-muted">Loading profiles…</p>}
+                  </div>
+                ))
+              : list.map((s) => (
               <button
                 key={s.id}
                 type="button"
@@ -99,9 +110,6 @@ export default function LoginPage() {
                 </span>
               </button>
             ))}
-            {list.length === 0 && (
-              <p className="py-6 text-center text-[14px] text-muted">Loading profiles…</p>
-            )}
           </div>
         </div>
       ) : (

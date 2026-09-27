@@ -46,6 +46,9 @@ const DAY = 86_400_000;
 const HOUR = 3_600_000;
 const MIN = 60_000;
 
+/** Cooperatively yield so the browser can paint/interact between heavy chunks. */
+const yieldToEventLoop = (): Promise<void> => new Promise((r) => setTimeout(r, 0));
+
 /* ------------------------------- static config ------------------------------- */
 
 interface StationDef {
@@ -305,6 +308,7 @@ export async function generateSeedDataset(now = Date.now(), seed = 20260926): Pr
   for (const d of STATIONS) deliveryCursor[d.id] = 89 - ri(rng, 0, 4);
 
   for (let daysAgo = 89; daysAgo >= 0; daysAgo--) {
+    await yieldToEventLoop();
     const day0 = today0 - daysAgo * DAY;
 
     for (const d of STATIONS) {
@@ -507,7 +511,9 @@ export async function generateSeedDataset(now = Date.now(), seed = 20260926): Pr
   const tankFor = (sale: { stationId: string; productCode?: string }) =>
     sale.productCode ? tankForProduct(sale.stationId, sale.productCode) : undefined;
 
-  for (const ev of events) {
+  for (let ei = 0; ei < events.length; ei++) {
+    const ev = events[ei];
+    if (ei % 300 === 0) await yieldToEventLoop();
     if (ev.ts > now) continue;
 
     switch (ev.kind) {

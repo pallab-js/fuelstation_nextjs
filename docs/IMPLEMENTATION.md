@@ -63,7 +63,12 @@ Phased delivery for the FuelOps prototype. Every phase ends with
       keypad grid, duplicate hourly label, mobile revenue-trend collapse, list caps,
       date/relative consistency, ST-09 theft always in the past (see CHANGELOG 0.1.2)
 - [x] Final gate: `npm run lint && npm run typecheck && npm test && npm run build` ✓
-      + airplane-mode pass ✓ (E2E offline) + Lighthouse (PWA/AA) sanity — not run
+      + airplane-mode pass ✓ (E2E offline)
+      + Lighthouse sanity (local, Brave headless): performance 60 · accessibility 100 ·
+        best-practices 100 · PWA 88 — the only PWA sub-fail is `content-width`, a
+        flaky `window.outerWidth` artifact in headless (values 413–418 across runs on
+        identical builds); the app itself has zero horizontal overflow (scrollWidth ==
+        viewport verified at 375/412/1440). Not run in CI.
 
 ## Demo script (for showcase)
 1. Open `/login` → pick **Anita (Owner)** → PIN `1234`.

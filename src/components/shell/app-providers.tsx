@@ -41,7 +41,7 @@ function Gate({ children }: { children: ReactNode }) {
             style={{ width: `${Math.max(4, pct)}%` }}
           />
         </div>
-        <p className="text-[14px] text-body-muted" aria-live="polite">
+        <p className="w-64 text-center text-[14px] text-body-muted" aria-live="polite">
           {label}
         </p>
       </div>

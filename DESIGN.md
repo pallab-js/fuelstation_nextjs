@@ -16,7 +16,7 @@ colors:
   hairline: "#d9d9dd"
   border-light: "#e5e7eb"
   card-border: "#f2f2f2"
-  muted: "#93939f"
+  muted: "#68687a"
   slate: "#75758a"
   body-muted: "#616161"
   action-blue: "#1863dc"
@@ -232,7 +232,8 @@ What makes the system distinctive is the mix of austere black-and-white UI with 
 ### Text & Rules
 
 - **Ink** (`#212121`): Default body text and most link text on light backgrounds.
-- **Muted Slate** (`#93939f`): Footer links, dates, metadata, and de-emphasized labels.
+- **Muted Slate** (`#68687a`): Footer links, dates, metadata, and de-emphasized labels.
+  (Darkened from the original `#93939f` to meet WCAG AA 4.5:1 on white and stone backgrounds.)
 - **Slate** (`#75758a`): Research separators and tertiary text.
 - **Hairline** (`#d9d9dd`): Standard list rules and section dividers.
 - **Border Light** (`#e5e7eb`): Secondary divider and utility rule.

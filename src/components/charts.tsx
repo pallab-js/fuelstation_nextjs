@@ -46,9 +46,9 @@ export function RevenueTrendChart({ points }: { points: DayPoint[] }) {
               </linearGradient>
             </defs>
             <CartesianGrid stroke="#d9d9dd" strokeDasharray="2 4" vertical={false} />
-            <XAxis dataKey="day" tick={{ ...AXIS, fill: "#93939f" }} tickLine={false} axisLine={{ stroke: "#d9d9dd" }} minTickGap={22} />
+            <XAxis dataKey="day" tick={{ ...AXIS, fill: "#68687a" }} tickLine={false} axisLine={{ stroke: "#d9d9dd" }} minTickGap={22} />
             <YAxis
-              tick={{ ...AXIS, fill: "#93939f" }}
+              tick={{ ...AXIS, fill: "#68687a" }}
               tickLine={false}
               axisLine={false}
               width={58}

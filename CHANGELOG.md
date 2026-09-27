@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.1.3 — 2026-09-27
+
+Lighthouse sanity pass (perf / accessibility / PWA).
+
+- **Accessibility 94 → 100:** muted text token darkened `#93939f` → `#68687a`
+  (≥ 4.5:1 AA on white and stone backgrounds — 12px mono-labels previously failed
+  contrast); chart axis ticks updated to match; DESIGN.md / docs updated.
+- **PWA splash screen:** real PNG icons generated (`icon-192`, `icon-512`,
+  `icon-maskable-512` — maskable on full-bleed theme color) and registered in the
+  manifest; Lighthouse's "PNG ≥ 512px" requirement now passes.
+- **First-load performance 27 → 60 (emulated slow-4G + 4× CPU):** seed generation
+  now cooperatively yields to the event loop every day / every 300 events instead of
+  running as multi-second main-thread blocks (TBT 2,830 → ~1,600 ms; production is
+  better — GitHub Pages serves brotli, the audit's local server now does too).
+- **CLS 0.38 → 0.003:** the login profile list renders reserved-size skeleton rows
+  (exact 72.5px row geometry), so the list appearing no longer reflows the card; the
+  boot splash label has a fixed width so phase-text changes don't shift it.
+- Verified: lint/typecheck/31 tests/build green, Brave smoke 21/21, visual probes.
+- Recorded result: **performance 60 · accessibility 100 · best-practices 100 ·
+  PWA 88** — the lone PWA sub-fail (`content-width`) is a flaky headless
+  `window.outerWidth` artifact (413–418 px across identical runs); the app has zero
+  real horizontal overflow at 375/412/1440.
+
 ## 0.1.2 — 2026-09-27
 
 UI/UX review pass (desktop + 375px mobile screenshot audit).

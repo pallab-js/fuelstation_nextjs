@@ -14,7 +14,7 @@ not a marketing page.
   --color-deep-green: #003c33; --color-dark-navy: #071829; --color-soft-stone: #eeece7;
   --color-pale-green: #edfce9; --color-pale-blue: #f1f5ff;
   --color-hairline: #d9d9dd;   --color-border-light: #e5e7eb; --color-card-border: #f2f2f2;
-  --color-muted: #93939f;      --color-slate: #75758a;    --color-body-muted: #616161;
+  --color-muted: #68687a;      --color-slate: #75758a;    --color-body-muted: #616161;
   --color-action-blue: #1863dc; --color-focus-blue: #4c6ee6;
   --color-coral: #ff7759;      --color-coral-soft: #ffad9b;
   --color-form-focus: #9b60aa; --color-error: #b30000;
@@ -169,7 +169,7 @@ Hero/display type scales down (96 → 48 px) below 768.
 
 Focus-visible rings everywhere; dialog focus trap; form errors linked via
 `aria-describedby` + `aria-invalid`; charts get `<figcaption>`/sr-only summaries;
-color contrast ≥ 4.5:1 (muted #93939f only on ≥18px decorative labels, body uses
+color contrast ≥ 4.5:1 (muted #68687a meets AA on white and stone, body uses
 #616161); touch targets ≥ 40 px.
 
 ## 9. Do / Don't (adapted)
