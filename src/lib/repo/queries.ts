@@ -1,4 +1,5 @@
 import { db } from "@/lib/db/dexie";
+import type { EntityTable } from "dexie";
 import type {
   Alert,
   BankDeposit,
@@ -40,6 +41,67 @@ import { expectedCashPaise } from "@/lib/domain/variance";
 
 /* ------------------------------- helpers ------------------------------- */
 
+/*
+ * Scope-aware loaders. Invariant: for any single-station scope `s`, the rows
+ * returned here MUST equal `loadAll().filter(r => scopeMatches(r.stationId, s))`
+ * — same result set, but read through the `[stationId+ts]` / `stationId`
+ * indexes instead of pulling every station's rows into memory and filtering in
+ * JS. The "all" scope keeps the original range-index path unchanged.
+ */
+
+/**
+ * Return the concrete station ids a scope resolves to, or `null` for the
+ * network-wide ("all") scope. Lets callers choose an index-backed query for a
+ * single station instead of loading every station's rows and filtering in JS.
+ */
+async function scopeStationIds(scope: Scope): Promise<string[] | null> {
+  if (scope === "all") return null;
+  return [scope];
+}
+
+/**
+ * Sales within [from,to] for a scope. Uses the `[stationId+ts]` compound index
+ * when scoped to a single station, falling back to the `ts` range index for the
+ * network-wide scope. Avoids pulling every station's sales into memory.
+ */
+async function salesInRange(scope: Scope, from: number, to: number): Promise<Sale[]> {
+  const ids = await scopeStationIds(scope);
+  if (!ids) return db.sales.where("ts").between(from, to, true, true).toArray();
+  const perStation = await Promise.all(
+    ids.map((id) =>
+      db.sales.where("[stationId+ts]").between([id, from], [id, to], true, true).toArray(),
+    ),
+  );
+  return perStation.flat();
+}
+
+/** Shifts for a scope, using the `stationId` index when scoped to one station. */
+async function shiftsForScope(scope: Scope): Promise<Shift[]> {
+  const ids = await scopeStationIds(scope);
+  if (!ids) return db.shifts.toArray();
+  const per = await Promise.all(ids.map((id) => db.shifts.where("stationId").equals(id).toArray()));
+  return per.flat();
+}
+
+/** Stations for a scope, using a point-get when scoped to one station. */
+async function stationsForScope(scope: Scope): Promise<Station[]> {
+  const ids = await scopeStationIds(scope);
+  if (!ids) return db.stations.toArray();
+  const per = await Promise.all(ids.map((id) => db.stations.get(id)));
+  return per.filter((s): s is Station => s !== undefined);
+}
+
+/** Rows carrying a `stationId`, loaded via that index when scoped to one station. */
+async function byStation<T extends { id: string; stationId: string }>(
+  table: EntityTable<T, "id">,
+  scope: Scope,
+): Promise<T[]> {
+  const ids = await scopeStationIds(scope);
+  if (!ids) return table.toArray();
+  const per = await Promise.all(ids.map((id) => table.where("stationId").equals(id).toArray()));
+  return per.flat();
+}
+
 export interface ScopedRows {
   stations: Station[];
   sales: Sale[];
@@ -51,22 +113,28 @@ export interface ScopedRows {
 
 /** Load the station-scoped operational rows for a scope + range. */
 export async function loadScopedRows(scope: Scope, range: { from: number; to: number }): Promise<ScopedRows> {
+  const inRange = (r: { ts: number }) => r.ts >= range.from && r.ts <= range.to;
   const [stations, sales, shifts, recons, expenses, deposits] = await Promise.all([
-    db.stations.toArray(),
-    db.sales.where("ts").between(range.from, range.to, true, true).toArray(),
-    db.shifts.toArray(),
-    db.reconciliations.where("ts").between(range.from, range.to, true, true).toArray(),
-    db.expenses.where("ts").between(range.from, range.to, true, true).toArray(),
-    db.deposits.where("ts").between(range.from, range.to, true, true).toArray(),
+    stationsForScope(scope),
+    salesInRange(scope, range.from, range.to),
+    shiftsForScope(scope),
+    scope === "all"
+      ? db.reconciliations.where("ts").between(range.from, range.to, true, true).toArray()
+      : byStation(db.reconciliations, scope).then((rows) => rows.filter(inRange)),
+    scope === "all"
+      ? db.expenses.where("ts").between(range.from, range.to, true, true).toArray()
+      : byStation(db.expenses, scope).then((rows) => rows.filter(inRange)),
+    scope === "all"
+      ? db.deposits.where("ts").between(range.from, range.to, true, true).toArray()
+      : byStation(db.deposits, scope).then((rows) => rows.filter(inRange)),
   ]);
-  const keep = (r: { stationId: string }) => scopeMatches(r.stationId, scope);
   return {
-    stations: stations.filter((s) => scopeMatches(s.id, scope) && s.status === "active"),
-    sales: sales.filter(keep),
-    shifts: shifts.filter(keep),
-    recons: recons.filter(keep),
-    expenses: expenses.filter(keep),
-    deposits: deposits.filter(keep),
+    stations: stations.filter((s) => s.status === "active"),
+    sales,
+    shifts: shifts.filter((r) => scopeMatches(r.stationId, scope)),
+    recons,
+    expenses,
+    deposits,
   };
 }
 
@@ -121,22 +189,26 @@ export async function queryDashboard(
     customers,
     creditTxns,
   ] = await Promise.all([
-    db.stations.toArray(),
-    db.sales.where("ts").between(prev.from, range.to, true, true).toArray(),
-    db.shifts.toArray(),
-    db.tanks.toArray(),
+    stationsForScope(scope),
+    salesInRange(scope, prev.from, range.to),
+    shiftsForScope(scope),
+    byStation(db.tanks, scope),
     db.dips.toArray(),
     db.deliveries.toArray(),
     db.alerts.toArray(),
-    db.expenses.where("ts").between(range.from, range.to, true, true).toArray(),
-    db.reconciliations.where("ts").between(range.from, range.to, true, true).toArray(),
+    scope === "all"
+      ? db.expenses.where("ts").between(range.from, range.to, true, true).toArray()
+      : byStation(db.expenses, scope).then((rows) => rows.filter((e) => e.ts >= range.from && e.ts <= range.to)),
+    scope === "all"
+      ? db.reconciliations.where("ts").between(range.from, range.to, true, true).toArray()
+      : byStation(db.reconciliations, scope).then((rows) => rows.filter((r) => r.ts >= range.from && r.ts <= range.to)),
     db.retailItems.toArray(),
     db.customers.toArray(),
     db.creditTxns.toArray(),
   ]);
 
   const inScope = (stationId: string) => scopeMatches(stationId, scope);
-  const stations = stationsAll.filter((s) => inScope(s.id));
+  const stations = stationsAll;
   const scopeSales = sales.filter((s) => inScope(s.stationId));
   const nowSales = scopeSales.filter((s) => s.ts >= range.from);
   const prevSales = scopeSales.filter((s) => s.ts >= prev.from && s.ts < range.from);
@@ -347,16 +419,16 @@ export interface InventoryData {
 export async function queryInventory(scope: Scope, now = Date.now()): Promise<InventoryData> {
   const from = addDays(now, -30);
   const [stations, tanks, dips, deliveries, sales30, items, products] = await Promise.all([
-    db.stations.toArray(),
-    db.tanks.toArray(),
+    stationsForScope(scope),
+    byStation(db.tanks, scope),
     db.dips.where("ts").between(from, now, true, true).reverse().toArray(),
     db.deliveries.where("ts").between(from, now, true, true).reverse().toArray(),
-    db.sales.where("ts").between(from, now, true, true).toArray(),
-    db.retailItems.toArray(),
+    salesInRange(scope, from, now),
+    byStation(db.retailItems, scope),
     db.products.toArray(),
   ]);
   const inScope = (stationId: string) => scopeMatches(stationId, scope);
-  const scopedTanks = tanks.filter((t) => inScope(t.stationId));
+  const scopedTanks = tanks;
   const tankName = new Map(scopedTanks.map((t) => [t.id, t.name]));
 
   return {
@@ -428,15 +500,15 @@ export interface StationCard {
 export async function queryStationCards(scope: Scope, now = Date.now()): Promise<StationCard[]> {
   const dayStart = startOfDay(now);
   const [stations, sales, shifts, tanks, dips, deliveries, staff] = await Promise.all([
-    db.stations.toArray(),
-    db.sales.where("ts").between(dayStart, now, true, true).toArray(),
-    db.shifts.toArray(),
-    db.tanks.toArray(),
+    stationsForScope(scope),
+    salesInRange(scope, dayStart, now),
+    shiftsForScope(scope),
+    byStation(db.tanks, scope),
     db.dips.toArray(),
     db.deliveries.toArray(),
     db.staff.toArray(),
   ]);
-  const visible = stations.filter((s) => scopeMatches(s.id, scope));
+  const visible = stations;
   return visible.map((station) => {
     const rows = sales.filter((s) => s.stationId === station.id);
     const stTanks = tanks.filter((t) => t.stationId === station.id);

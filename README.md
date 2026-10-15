@@ -73,6 +73,13 @@ implementation plan. Design system source: `DESIGN.md`.
 
 ## Roles
 
+Role gating is enforced **client-side only** — nav filtering plus in-page
+`RequireRole` guards. Because the session (role/scope) lives in the browser,
+it is a workflow convenience, not a security boundary: anyone with devtools
+access can edit local state. A real deployment would move authorization behind
+a trusted server. The matrix below describes intended workflow access, not
+tamper-proof enforcement.
+
 | | Owner | Manager | Attendant |
 |---|---|---|---|
 | Network scope | all stations | own / network | own station |
@@ -84,9 +91,14 @@ implementation plan. Design system source: `DESIGN.md`.
 ## Offline & privacy
 
 - No servers, no telemetry — data never leaves the device.
-- PINs are stored as salted PBKDF2-SHA256 (100k iterations, WebCrypto) with login
-  attempt backoff; **they are a convenience lock, not real security**.
-- Full JSON backup/restore from Settings for portability.
+- PINs are stored as salted PBKDF2-SHA256 (100k iterations, WebCrypto). The
+  login screen adds a small progressive delay after repeated wrong PINs, but
+  that counter is in-memory and client-side — a UX speed-bump, not a real
+  brute-force control. PINs are **a convenience lock, not real security**.
+- Full JSON backup/restore from Settings for portability, plus a non-destructive
+  **Merge** that combines another device's export (append-only ledgers union,
+  mutable rows resolved last-write-wins) — the local, transport-free core of the
+  planned sync layer.
 
 ## Distribution
 

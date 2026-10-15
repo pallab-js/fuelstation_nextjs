@@ -25,6 +25,22 @@ describe("balanceOf", () => {
     ];
     expect(balanceOf(txns)).toBe(40_000);
   });
+
+  it("a positive adjustment increases the balance (surcharge)", () => {
+    const txns = [
+      txn({ id: "a", ts: NOW - 10 * DAY, type: "charge", amountPaise: 100_000 }),
+      txn({ id: "b", ts: NOW - 5 * DAY, type: "adjustment", amountPaise: 25_000 }),
+    ];
+    expect(balanceOf(txns)).toBe(125_000);
+  });
+
+  it("a negative adjustment decreases the balance (write-off / goodwill credit)", () => {
+    const txns = [
+      txn({ id: "a", ts: NOW - 10 * DAY, type: "charge", amountPaise: 100_000 }),
+      txn({ id: "b", ts: NOW - 5 * DAY, type: "adjustment", amountPaise: -30_000 }),
+    ];
+    expect(balanceOf(txns)).toBe(70_000);
+  });
 });
 
 describe("agingOf", () => {

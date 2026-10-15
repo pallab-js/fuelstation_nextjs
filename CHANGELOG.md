@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.1.4 — 2026-10-16
+
+Post-review hardening pass (correctness, performance, local sync groundwork).
+
+- **Atomic receipt / voucher numbering:** sequence numbers were derived from
+  `table.count() + 1` outside the write transaction, so two concurrent sales (two
+  tabs or a double-submit) could mint duplicate receipt numbers. Added a
+  transactional monotonic counter (`nextSequence` in `repo/common.ts`); receipt and
+  voucher allocation now happens inside the same `rw` transaction as the insert.
+  Counters seed from the existing row count so numbering is continuous with
+  pre-existing data.
+- **Credit adjustment sign convention:** documented and tested that a positive
+  `adjustCredit` amount increases the balance (surcharge) and a negative amount
+  decreases it (write-off / goodwill credit); added a zero-amount guard.
+- **Indexed scope queries:** dashboard / station-cards / inventory / report loaders
+  no longer pull every station's rows into memory and filter in JS. When scoped to a
+  single station they read through the `[stationId+ts]` / `stationId` indexes; the
+  network-wide ("all") scope keeps the original range-index path. Output is
+  equivalent (invariant documented in `repo/queries.ts`).
+- **Non-destructive backup Merge:** new pure merge engine (`repo/merge.ts`) and
+  `mergeBackup` combine another device's JSON export into the local database without
+  clearing rows — append-only ledgers union, mutable rows resolve last-write-wins by
+  `updatedAt`. Exposed as a "Merge JSON" action in Settings alongside Import
+  (replace). This is the local, transport-free core of the planned sync layer.
+- **Docs:** README softened to match reality — PIN login backoff is an in-memory
+  client-side speed-bump (not a brute-force control); role gating is client-only.
+- Verified: lint / typecheck / 50 tests / build green (test count 31 → 50).
+
 ## 0.1.3 — 2026-09-27
 
 Lighthouse sanity pass (perf / accessibility / PWA).

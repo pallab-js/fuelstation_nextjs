@@ -17,7 +17,7 @@ import { balanceOf } from "@/lib/domain/aging";
 import { receiptNo } from "@/lib/domain/format";
 import { reconcile } from "@/lib/domain/variance";
 import { syncAlerts } from "./alerts";
-import { audit, DomainError, uid } from "./common";
+import { audit, DomainError, nextSequence, uid } from "./common";
 
 export interface Actor {
   id: string;
@@ -148,11 +148,6 @@ async function guardCredit(
   return { dueDays: account.dueDays };
 }
 
-async function nextReceipt(): Promise<string> {
-  const n = await db.sales.count();
-  return receiptNo(n + 1);
-}
-
 export interface FuelSaleInput {
   stationId: string;
   staffId: string;
@@ -197,11 +192,12 @@ export async function postFuelSale(input: FuelSaleInput): Promise<Sale> {
     payment: input.payment,
     customerId: input.payment === "credit" ? input.customerId : undefined,
     attendantId: input.staffId,
-    receiptNo: await nextReceipt(),
+    receiptNo: "",
     updatedAt: ts,
   };
 
-  await db.transaction("rw", db.sales, db.nozzles, db.creditTxns, async () => {
+  await db.transaction("rw", db.sales, db.nozzles, db.creditTxns, db.settings, async () => {
+    sale.receiptNo = receiptNo(await nextSequence("receipt", await db.sales.count()));
     await db.sales.add(sale);
     if (input.nozzleId) {
       const nozzle = await db.nozzles.get(input.nozzleId);
@@ -274,12 +270,13 @@ export async function postRetailSale(input: RetailSaleInput): Promise<Sale> {
     payment: input.payment,
     customerId: input.payment === "credit" ? input.customerId : undefined,
     attendantId: input.staffId,
-    receiptNo: await nextReceipt(),
+    receiptNo: "",
     lines,
     updatedAt: ts,
   };
 
-  await db.transaction("rw", db.sales, db.retailItems, db.creditTxns, async () => {
+  await db.transaction("rw", db.sales, db.retailItems, db.creditTxns, db.settings, async () => {
+    sale.receiptNo = receiptNo(await nextSequence("receipt", await db.sales.count()));
     await db.sales.add(sale);
     for (let i = 0; i < input.lines.length; i++) {
       const item = items[i]!;
@@ -381,7 +378,6 @@ export async function addExpense(input: {
 }): Promise<Expense> {
   if (input.amountPaise <= 0) throw new DomainError("Amount must be positive.");
   const ts = Date.now();
-  const count = await db.expenses.count();
   const row: Expense = {
     id: uid("exp"),
     stationId: input.stationId,
@@ -389,13 +385,17 @@ export async function addExpense(input: {
     category: input.category,
     amountPaise: input.amountPaise,
     paidBy: input.paidBy,
-    voucherNo: `V-${String(count + 1).padStart(5, "0")}`,
+    voucherNo: "",
     shiftId: input.shiftId,
     note: input.note,
     staffId: input.staffId,
     updatedAt: ts,
   };
-  await db.expenses.add(row);
+  await db.transaction("rw", db.expenses, db.settings, async () => {
+    const n = await nextSequence("voucher", await db.expenses.count());
+    row.voucherNo = `V-${String(n).padStart(5, "0")}`;
+    await db.expenses.add(row);
+  });
   await audit(input.staffId, "expense.add", "expense", row.id, `${row.voucherNo} — ${input.note}`);
   return row;
 }
@@ -457,11 +457,18 @@ export async function recordPayment(input: {
 
 export async function adjustCredit(input: {
   customerId: string;
+  /**
+   * Signed adjustment in paise: POSITIVE increases the customer's outstanding
+   * balance (surcharge / back-charge), NEGATIVE decreases it (write-off /
+   * goodwill credit). Unlike payments, this amount is intentionally not
+   * constrained to be positive. See `balanceOf` for how it folds into balance.
+   */
   amountPaise: number;
   staffId: string;
   note: string;
 }): Promise<CreditTxn> {
   if (!input.note) throw new DomainError("Adjustment needs a note.");
+  if (input.amountPaise === 0) throw new DomainError("Adjustment cannot be zero.");
   const ts = Date.now();
   const txn: CreditTxn = {
     id: uid("ctx"),

@@ -12,11 +12,22 @@ export interface Aging {
 
 const DAY = 86_400_000;
 
-/** Outstanding balance for a customer (paise; charges positive, payments negative). */
+/**
+ * Outstanding balance for a customer (paise).
+ *
+ * Sign convention:
+ *  - `charge`      → increases balance by `amountPaise` (always positive).
+ *  - `payment`     → decreases balance by `amountPaise` (stored positive,
+ *                    validated `> 0` at write time).
+ *  - `adjustment`  → signed: a POSITIVE `amountPaise` increases the balance
+ *                    (e.g. a surcharge or back-charge), a NEGATIVE `amountPaise`
+ *                    decreases it (e.g. a write-off or goodwill credit). This is
+ *                    the one transaction type whose amount may be negative.
+ */
 export function balanceOf(txns: CreditTxn[]): number {
   return txns.reduce((sum, t) => {
     if (t.type === "payment") return sum - t.amountPaise;
-    if (t.type === "adjustment") return sum + t.amountPaise;
+    if (t.type === "adjustment") return sum + t.amountPaise; // signed; see note above
     return sum + t.amountPaise;
   }, 0);
 }

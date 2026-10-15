@@ -20,6 +20,7 @@ import {
   downloadBackup,
   exportBackup,
   importBackup,
+  mergeBackup,
   setStaffActive,
   setStaffPin,
   setStationStatus,
@@ -43,7 +44,7 @@ export default function SettingsPage() {
   const [confirmReset, setConfirmReset] = useState(false);
   const [busy, setBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
-
+  const mergeRef = useRef<HTMLInputElement>(null);
   if (role !== "owner") {
     return (
       <EmptyState
@@ -102,6 +103,18 @@ export default function SettingsPage() {
       const parsed: unknown = JSON.parse(await file.text());
       await importBackup(parsed, profileId!);
       toast.success("Backup restored", file.name);
+    } catch (e) {
+      toast.error(e instanceof DomainError ? e.message : "That file is not a valid backup.");
+    }
+  };
+
+  const doMerge = async (file: File) => {
+    try {
+      const parsed: unknown = JSON.parse(await file.text());
+      const report = await mergeBackup(parsed, profileId!);
+      const added = Object.values(report).reduce((a, s) => a + s.added, 0);
+      const updated = Object.values(report).reduce((a, s) => a + s.updated, 0);
+      toast.success("Backup merged", `+${added} new, ${updated} updated (nothing removed).`);
     } catch (e) {
       toast.error(e instanceof DomainError ? e.message : "That file is not a valid backup.");
     }
@@ -284,6 +297,8 @@ export default function SettingsPage() {
           </div>
           <p className="mt-2 text-[14px] text-body-muted">
             Everything lives in this browser. Export a JSON snapshot before clearing site data.
+            Import replaces matching tables; Merge combines another device&apos;s export without
+            removing local rows (ledgers union, newest edit wins).
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <Button variant="outline" onClick={doExport}>
@@ -291,6 +306,9 @@ export default function SettingsPage() {
             </Button>
             <Button variant="outline" onClick={() => fileRef.current?.click()}>
               <Upload className="size-4" aria-hidden /> Import JSON
+            </Button>
+            <Button variant="outline" onClick={() => mergeRef.current?.click()}>
+              <Upload className="size-4" aria-hidden /> Merge JSON
             </Button>
             <input
               ref={fileRef}
@@ -300,6 +318,17 @@ export default function SettingsPage() {
               onChange={(e) => {
                 const f = e.target.files?.[0];
                 if (f) doImport(f);
+                e.target.value = "";
+              }}
+            />
+            <input
+              ref={mergeRef}
+              type="file"
+              accept="application/json"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) doMerge(f);
                 e.target.value = "";
               }}
             />

@@ -3,6 +3,7 @@ import type { Staff, Station } from "@/lib/db/types";
 import { hashPin, randomSalt } from "@/lib/db/pin";
 import { audit, DomainError } from "./common";
 import { parseBackup } from "./backup-schema";
+import { keyFieldFor, mergeRows, strategyFor, type MergeStats } from "./merge";
 
 /* -------------------------------- stations ------------------------------ */
 
@@ -108,6 +109,53 @@ export async function importBackup(input: unknown, staffId: string): Promise<voi
     }
   });
   await audit(staffId, "backup.import", "system", "backup", `imported ${backup.exportedAt} (${present.length} tables)`);
+}
+
+/**
+ * Non-destructively MERGE a backup into the current database instead of
+ * replacing it. Append-only ledgers are unioned; mutable rows are resolved
+ * last-write-wins by `updatedAt` (see `merge.ts`). Unlike `importBackup`, no
+ * local row is ever cleared — importing a sibling device's export adds its
+ * data rather than wiping yours. This is the local, transport-free form of the
+ * planned sync merge.
+ */
+export async function mergeBackup(
+  input: unknown,
+  staffId: string,
+): Promise<Record<string, MergeStats>> {
+  const parsed = parseBackup(input);
+  if (!parsed.ok) throw new DomainError(parsed.error);
+  const backup = parsed.data;
+  const present = TABLES.filter((t) => parsed.tableNames.includes(t));
+  if (present.length === 0) throw new DomainError("Backup contains no table data.");
+
+  const report: Record<string, MergeStats> = {};
+  await db.transaction("rw", TABLES, async () => {
+    for (const t of present) {
+      const incoming = (backup.tables[t] ?? []) as Record<string, unknown>[];
+      const table = db.table(t);
+      const base = (await table.toArray()) as Record<string, unknown>[];
+      const field = keyFieldFor(t);
+      const keyOf = (row: Record<string, unknown>) => String(row[field]);
+      const { rows, stats } = mergeRows(base, incoming, strategyFor(t), keyOf);
+      // Only write when the merge changed something, to avoid needless churn.
+      if (stats.added > 0 || stats.updated > 0) {
+        await table.bulkPut(rows as never[]);
+      }
+      report[t] = stats;
+    }
+  });
+
+  const totalAdded = Object.values(report).reduce((a, s) => a + s.added, 0);
+  const totalUpdated = Object.values(report).reduce((a, s) => a + s.updated, 0);
+  await audit(
+    staffId,
+    "backup.merge",
+    "system",
+    "backup",
+    `merged ${backup.exportedAt} — +${totalAdded} new, ${totalUpdated} updated across ${present.length} tables`,
+  );
+  return report;
 }
 
 export function downloadBackup(backup: Backup): void {
