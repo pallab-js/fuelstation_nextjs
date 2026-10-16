@@ -354,7 +354,7 @@ export async function recordDelivery(input: {
     productCode: tank.productCode,
     ts,
     invoiceNo: input.invoiceNo || `INV-${ts.toString().slice(-6)}`,
-    supplier: input.supplier || "Hindustan Petroleum",
+    supplier: input.supplier || "IOCL Guwahati Terminal",
     volumeMl: input.volumeMl,
     ratePaise: input.ratePaise,
     amountPaise: Math.round((input.volumeMl * input.ratePaise) / 1000),

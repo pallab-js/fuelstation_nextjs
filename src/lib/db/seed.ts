@@ -65,22 +65,22 @@ interface StationDef {
 }
 
 const STATIONS: StationDef[] = [
-  { id: "st_shf01", code: "SHF-01", name: "Sharma Fuel Hub", city: "Pune", address: "12 FC Road, Pune, MH", tolerancePaise: 10_000, pumps: 2, premium: true, live: true, factor: 1.0 },
-  { id: "st_nh44", code: "NH-44", name: "Ashoka Highway Servo", city: "Bengaluru", address: "NH-44, Devanahalli, KA", tolerancePaise: 10_000, pumps: 2, premium: false, live: true, factor: 1.5 },
-  { id: "st_rv07", code: "RV-07", name: "Riverside Fuels", city: "Jaipur", address: "Tonk Road, Jaipur, RJ", tolerancePaise: 10_000, pumps: 2, premium: false, live: true, factor: 0.9 },
-  { id: "st_ap12", code: "AP-12", name: "Airport Road Petrol", city: "Lucknow", address: "Amausi Airport Rd, Lucknow, UP", tolerancePaise: 20_000, pumps: 2, premium: false, live: false, factor: 1.1 },
-  { id: "st_st09", code: "ST-09", name: "Satellite Servo Centre", city: "Surat", address: "VGSD Road, Surat, GJ", tolerancePaise: 10_000, pumps: 1, premium: false, live: false, factor: 0.6 },
+  { id: "st_shf01", code: "SHF-01", name: "Sharma Fuel Hub", city: "Guwahati", address: "GS Road, Dispur, Guwahati, AS", tolerancePaise: 10_000, pumps: 2, premium: true, live: true, factor: 1.0 },
+  { id: "st_nh44", code: "NH-37", name: "Ashoka Highway Servo", city: "Dibrugarh", address: "NH-37, Lahowal, Dibrugarh, AS", tolerancePaise: 10_000, pumps: 2, premium: false, live: true, factor: 1.5 },
+  { id: "st_rv07", code: "RV-07", name: "Riverside Fuels", city: "Silchar", address: "Park Road, Tarapur, Silchar, AS", tolerancePaise: 10_000, pumps: 2, premium: false, live: true, factor: 0.9 },
+  { id: "st_ap12", code: "AP-12", name: "Airport Road Petrol", city: "Jorhat", address: "Rowriah Airport Rd, Jorhat, AS", tolerancePaise: 20_000, pumps: 2, premium: false, live: false, factor: 1.1 },
+  { id: "st_st09", code: "ST-09", name: "Satellite Servo Centre", city: "Tezpur", address: "NH-15, Mission Chariali, Tezpur, AS", tolerancePaise: 10_000, pumps: 1, premium: false, live: false, factor: 0.6 },
 ];
 
 const STAFF = [
-  { id: "us_anita", name: "Anita Deshmukh", role: "owner", stationId: null, phone: "+91 98200 11111" },
-  { id: "us_ravi", name: "Ravi Kumar", role: "manager", stationId: "st_shf01", phone: "+91 98200 22222" },
-  { id: "us_meera", name: "Meera Iyer", role: "manager", stationId: null, phone: "+91 98200 33333" },
-  { id: "us_imran", name: "Imran Sheikh", role: "attendant", stationId: "st_shf01", phone: "+91 98200 44444" },
-  { id: "us_farhan", name: "Farhan Ali", role: "attendant", stationId: "st_nh44", phone: "+91 98200 55555" },
-  { id: "us_deepa", name: "Deepa Rao", role: "attendant", stationId: "st_rv07", phone: "+91 98200 66666" },
-  { id: "us_sunil", name: "Sunil Verma", role: "attendant", stationId: "st_ap12", phone: "+91 98200 77777" },
-  { id: "us_kavita", name: "Kavita Sharma", role: "attendant", stationId: "st_st09", phone: "+91 98200 88888" },
+  { id: "us_anita", name: "Anita Baruah", role: "owner", stationId: null, phone: "+91 98640 11111" },
+  { id: "us_ravi", name: "Ravi Bora", role: "manager", stationId: "st_shf01", phone: "+91 98640 22222" },
+  { id: "us_meera", name: "Meera Saikia", role: "manager", stationId: null, phone: "+91 98640 33333" },
+  { id: "us_imran", name: "Imran Ahmed", role: "attendant", stationId: "st_shf01", phone: "+91 98640 44444" },
+  { id: "us_farhan", name: "Farhan Hussain", role: "attendant", stationId: "st_nh44", phone: "+91 98640 55555" },
+  { id: "us_deepa", name: "Deepa Das", role: "attendant", stationId: "st_rv07", phone: "+91 98640 66666" },
+  { id: "us_sunil", name: "Sunil Gogoi", role: "attendant", stationId: "st_ap12", phone: "+91 98640 77777" },
+  { id: "us_kavita", name: "Kavita Deka", role: "attendant", stationId: "st_st09", phone: "+91 98640 88888" },
 ] as const;
 
 const ATTENDANT_BY_STATION: Record<string, string> = {
@@ -98,12 +98,12 @@ const PRODUCT_DEFS = [
 ];
 
 const CUSTOMERS = [
-  { id: "cu_1", code: "FL-001", name: "Swift Logistics", stationId: "st_shf01", limit: 250_000_00, dueDays: 15, kind: "fleet", vehicle: "MH 12 KJ 4410" },
-  { id: "cu_2", code: "FL-002", name: "Deccan Couriers", stationId: "st_shf01", limit: 150_000_00, dueDays: 15, kind: "fleet", vehicle: "MH 14 RT 9021" },
-  { id: "cu_3", code: "FL-003", name: "RedWay Cabs", stationId: "st_nh44", limit: 300_000_00, dueDays: 20, kind: "fleet", vehicle: "KA 05 MN 7788" },
-  { id: "cu_4", code: "FL-004", name: "Ganga Transport Co.", stationId: "st_ap12", limit: 100_000_00, dueDays: 15, kind: "credit", vehicle: "UP 32 LN 5512" },
-  { id: "cu_5", code: "FL-005", name: "Desert Rose Travels", stationId: "st_rv07", limit: 90_000_00, dueDays: 15, kind: "fleet", vehicle: "RJ 14 GB 3390" },
-  { id: "cu_6", code: "CR-006", name: "Patel Traders (Credit)", stationId: "st_st09", limit: 75_000_00, dueDays: 15, kind: "credit", vehicle: "GJ 05 BX 1122" },
+  { id: "cu_1", code: "FL-001", name: "Brahmaputra Logistics", stationId: "st_shf01", limit: 250_000_00, dueDays: 15, kind: "fleet", vehicle: "AS 01 KJ 4410" },
+  { id: "cu_2", code: "FL-002", name: "Kamrup Couriers", stationId: "st_shf01", limit: 150_000_00, dueDays: 15, kind: "fleet", vehicle: "AS 01 RT 9021" },
+  { id: "cu_3", code: "FL-003", name: "Dibrugarh Cabs", stationId: "st_nh44", limit: 300_000_00, dueDays: 20, kind: "fleet", vehicle: "AS 06 MN 7788" },
+  { id: "cu_4", code: "FL-004", name: "Barak Transport Co.", stationId: "st_ap12", limit: 100_000_00, dueDays: 15, kind: "credit", vehicle: "AS 03 LN 5512" },
+  { id: "cu_5", code: "FL-005", name: "Kaziranga Travels", stationId: "st_rv07", limit: 90_000_00, dueDays: 15, kind: "fleet", vehicle: "AS 11 GB 3390" },
+  { id: "cu_6", code: "CR-006", name: "Hazarika Traders (Credit)", stationId: "st_st09", limit: 75_000_00, dueDays: 15, kind: "credit", vehicle: "AS 12 BX 1122" },
 ];
 
 const RETAIL_CATALOG = [
@@ -724,7 +724,7 @@ export async function generateSeedDataset(now = Date.now(), seed = 20260926): Pr
           productCode: tank.productCode,
           ts: ev.ts,
           invoiceNo: `INV/25-26/${pad(seq.delivery, 4)}`,
-          supplier: pick(rng, ["HPCL Depot", "BPCL Depot", "IOCL Terminal", "Shell Supply"]),
+          supplier: pick(rng, ["IOCL Guwahati Terminal", "IOCL Digboi Refinery", "BPCL Betkuchi Depot", "HPCL Guwahati Depot"]),
           volumeMl,
           ratePaise: rate,
           amountPaise: Math.round((volumeMl * rate) / 1000),

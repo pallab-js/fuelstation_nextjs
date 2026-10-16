@@ -9,7 +9,8 @@ place: network KPIs, POS, shifts & cash reconciliation, tank/wet-stock monitorin
 credit & fleet ledgers, expenses, reports — with a professional, restrained UI.
 
 **Prototype scope:** all data lives in your browser (IndexedDB); works fully offline
-after first load; seeded with 90 days of deterministic demo data across 5 outlets.
+after first load; seeded with 90 days of deterministic demo data across 5 outlets
+based in Assam (Guwahati, Dibrugarh, Silchar, Jorhat, Tezpur).
 **[Live demo →](https://pallab-js.github.io/fuelstation_nextjs/)** (PIN `1234`).
 
 ## Screenshots

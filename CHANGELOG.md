@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.1.8 — 2026-10-16
+
+Localise the demo dataset to an Assam-based business.
+
+- **Stations** relocated to Assam: Guwahati, Dibrugarh, Silchar, Jorhat and Tezpur,
+  with local addresses and the real NH-37 corridor for the Dibrugarh outlet (station
+  record `id`s unchanged, so planted demo scenarios and references are preserved).
+- **Customers** renamed to regional fleets/traders (Brahmaputra Logistics, Kamrup
+  Couriers, Dibrugarh Cabs, Barak Transport, Kaziranga Travels, Hazarika Traders)
+  with `AS`-series vehicle registrations.
+- **Staff** given Assamese surnames (demo first names Anita / Ravi / Imran kept so the
+  README sign-in hint stays accurate); phone prefixes updated.
+- **Suppliers** localised to Assam depots/terminals (IOCL Guwahati Terminal, IOCL
+  Digboi Refinery, BPCL Betkuchi Depot, HPCL Guwahati Depot); runtime delivery
+  supplier fallback updated to match.
+- `SEED_VERSION` bumped 4 → 5 so existing local databases re-seed with the new data.
+- README prototype-scope line notes the Assam setting.
+- Verified: lint / typecheck / 50 tests (demo-shape + planted scenarios) / build green.
+
 ## 0.1.7 — 2026-10-16
 
 UI polish follow-ups (deferred items from the UI review).
