@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.1.5 — 2026-10-16
+
+Security remediation pass (findings from a source-level security assessment).
+
+- **Backup import/merge credential warning (V2):** restoring or merging a JSON
+  backup can overwrite the staff table — including login PIN hashes and roles — or
+  inject new staff accounts (merge resolves newer records last-write-wins). Both
+  actions now route through a confirmation dialog that names the file and warns the
+  owner that staff credentials may change, before any write runs. Prevents a trusted
+  owner from silently importing a credential-bearing file.
+- **Next.js 16.3.6 → 16.4.2 (V3):** patches the direct `next` advisories (Image
+  Optimization SSRF, SSG/ISR cache poisoning, Draft Mode leak, dev MCP info
+  disclosure) and `sharp`. These target server runtime features and are not reachable
+  in this app's static export, so the bump is defense-in-depth; `npm audit` high
+  count 8 → 6. The remaining advisories are dev-only (ESLint `fast-glob`/`micromatch`/
+  `braces`) or build-time (`source-map-js`) and are not in the shipped artifact.
+- Verified: lint / typecheck / 50 tests / build + service worker green.
+
+Not changed (documented in the assessment, require a product decision or a move off
+static hosting): client-only authorization is still forgeable via devtools; the PIN
+backoff remains an in-memory speed-bump; CSP ships as a meta tag with `'unsafe-inline'`
+and no `frame-ancestors` (static hosting cannot set real response headers).
+
 ## 0.1.4 — 2026-10-16
 
 Post-review hardening pass (correctness, performance, local sync groundwork).

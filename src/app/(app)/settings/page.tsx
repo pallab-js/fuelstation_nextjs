@@ -45,6 +45,7 @@ export default function SettingsPage() {
   const [busy, setBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const mergeRef = useRef<HTMLInputElement>(null);
+  const [pendingBackup, setPendingBackup] = useState<{ file: File; mode: "import" | "merge" } | null>(null);
   if (role !== "owner") {
     return (
       <EmptyState
@@ -118,6 +119,14 @@ export default function SettingsPage() {
     } catch (e) {
       toast.error(e instanceof DomainError ? e.message : "That file is not a valid backup.");
     }
+  };
+
+  const runPendingBackup = async () => {
+    if (!pendingBackup) return;
+    const { file, mode } = pendingBackup;
+    setPendingBackup(null);
+    if (mode === "import") await doImport(file);
+    else await doMerge(file);
   };
 
   const doReseed = async () => {
@@ -317,7 +326,7 @@ export default function SettingsPage() {
               className="hidden"
               onChange={(e) => {
                 const f = e.target.files?.[0];
-                if (f) doImport(f);
+                if (f) setPendingBackup({ file: f, mode: "import" });
                 e.target.value = "";
               }}
             />
@@ -328,7 +337,7 @@ export default function SettingsPage() {
               className="hidden"
               onChange={(e) => {
                 const f = e.target.files?.[0];
-                if (f) doMerge(f);
+                if (f) setPendingBackup({ file: f, mode: "merge" });
                 e.target.value = "";
               }}
             />
@@ -403,6 +412,43 @@ export default function SettingsPage() {
         }
       >
         <p className="text-[15px] text-body-muted">This cannot be undone from the UI.</p>
+      </Dialog>
+
+      {/* Backup import/merge confirmation — warns about credential alteration (security V2) */}
+      <Dialog
+        open={Boolean(pendingBackup)}
+        onClose={() => setPendingBackup(null)}
+        title={pendingBackup?.mode === "merge" ? "Merge backup file?" : "Restore backup file?"}
+        description={
+          pendingBackup?.mode === "merge"
+            ? "Combines another device's export into this database."
+            : "Replaces matching tables in this database."
+        }
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setPendingBackup(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant={pendingBackup?.mode === "merge" ? "primary" : "danger"}
+              onClick={runPendingBackup}
+            >
+              {pendingBackup?.mode === "merge" ? "Merge file" : "Restore file"}
+            </Button>
+          </>
+        }
+      >
+        <div className="space-y-2 text-[14px] text-body-muted">
+          <p className="font-mono text-[13px] text-ink">{pendingBackup?.file.name}</p>
+          <p className="rounded-sm border border-error/40 bg-[#fdf0f0] p-3 text-ink">
+            <strong>Security notice:</strong> a backup file can contain staff
+            accounts, roles and login PIN hashes.
+            {pendingBackup?.mode === "merge"
+              ? " Merging it may add staff or overwrite existing PINs/roles when the file's records are newer."
+              : " Restoring it will overwrite the staff table, replacing existing PINs and roles."}{" "}
+            Only proceed with a file you trust.
+          </p>
+        </div>
       </Dialog>
     </div>
   );
