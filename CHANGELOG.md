@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.1.7 — 2026-10-16
+
+UI polish follow-ups (deferred items from the UI review).
+
+- **StatCard large numbers:** KPI value font now steps down on narrow grids
+  (26 → 30 → 34px) and wraps instead of overflowing the card on a 2-column mobile
+  layout.
+- **Sticky-header anchor offset:** global `scroll-margin-top` on `:target` and
+  id-bearing headings/sections so in-page anchors don't land under the 56px sticky
+  top bar.
+- **Toolbar stability:** the online/offline indicator no longer reflows the top-bar
+  actions when connectivity flips — a single spacer owns the push-right, and the
+  chip collapses to "Offline" on very small screens.
+- Verified: lint / typecheck / 50 tests / build + service worker green. No README
+  change required (no documented behaviour, command or feature changed).
+
 ## 0.1.6 — 2026-10-16
 
 UI mobile + consistency pass (from a UI/responsiveness review).

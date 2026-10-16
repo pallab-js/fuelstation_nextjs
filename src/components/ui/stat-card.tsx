@@ -30,7 +30,12 @@ export function StatCard({
       )}
     >
       <span className="mono-label text-muted">{label}</span>
-      <span className={cn("display-tight text-[34px] leading-none tabular-nums", toneClass)}>
+      <span
+        className={cn(
+          "display-tight text-[26px] leading-none tabular-nums break-words sm:text-[30px] xl:text-[34px]",
+          toneClass,
+        )}
+      >
         {value}
       </span>
       {sub && <span className="text-[13px] text-body-muted">{sub}</span>}

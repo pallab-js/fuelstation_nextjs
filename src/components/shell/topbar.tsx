@@ -203,13 +203,19 @@ export function Topbar({
           <ScopeSwitcher />
         </div>
 
+        {/* Spacer that always owns the push-right, so toggling the offline chip
+            never changes the actions' margin (no toolbar reflow on connectivity
+            flips). On md+ the scope container above is the flex-1 spacer. */}
+        <div className="ml-auto md:hidden" />
+
         {!online && (
-          <span className="ml-auto flex items-center gap-1.5 rounded-pill border border-coral-soft bg-[#fff4f0] px-3 py-1 text-micro text-[#c14a2a]">
-            <WifiOff size={12} aria-hidden /> Offline · saved locally
+          <span className="flex items-center gap-1.5 rounded-pill border border-coral-soft bg-[#fff4f0] px-3 py-1 text-micro text-[#c14a2a]">
+            <WifiOff size={12} aria-hidden /> <span className="hidden sm:inline">Offline · saved locally</span>
+            <span className="sm:hidden">Offline</span>
           </span>
         )}
 
-        <div className={cn("ml-auto flex items-center gap-2", online && "md:ml-0")}>
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={onOpenPalette}

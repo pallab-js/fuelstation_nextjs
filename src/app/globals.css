@@ -103,6 +103,17 @@
     font-weight: 400;
     color: var(--color-primary);
   }
+
+  /* Sticky top bar is 56px (h-14); offset in-page anchor targets so a linked
+     heading/section isn't scrolled underneath it. */
+  :target,
+  h1[id],
+  h2[id],
+  h3[id],
+  h4[id],
+  section[id] {
+    scroll-margin-top: 72px;
+  }
 }
 
 @utility mono-label {
