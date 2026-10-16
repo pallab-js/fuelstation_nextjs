@@ -1,8 +1,11 @@
 "use client";
 
 import {
+  cloneElement,
   forwardRef,
+  isValidElement,
   type InputHTMLAttributes,
+  type ReactElement,
   type ReactNode,
   type SelectHTMLAttributes,
   type TextareaHTMLAttributes,
@@ -10,7 +13,7 @@ import {
 import { cn } from "@/lib/cn";
 
 const controlBase =
-  "w-full rounded-xs border border-hairline bg-white px-3 py-2.5 text-[15px] text-ink placeholder:text-muted transition-colors focus:border-form-focus focus:outline-none focus-visible:outline-none disabled:bg-soft-stone disabled:text-muted";
+  "w-full rounded-xs border border-hairline bg-white px-3 py-2.5 text-[15px] text-ink placeholder:text-muted transition-colors focus:border-form-focus focus:outline-none focus-visible:outline-none disabled:bg-soft-stone disabled:text-muted aria-[invalid=true]:border-error";
 
 export function Field({
   label,
@@ -27,14 +30,32 @@ export function Field({
   children: ReactNode;
   className?: string;
 }) {
+  const errorId = htmlFor ? `${htmlFor}-error` : undefined;
+
+  // Associate the error with the control for assistive tech. When an error is
+  // present and the child is a single element, inject aria-invalid +
+  // aria-describedby so screen readers announce the message with the field.
+  const control =
+    error && errorId && isValidElement(children)
+      ? cloneElement(children as ReactElement<Record<string, unknown>>, {
+          "aria-invalid": true,
+          "aria-describedby": [
+            (children.props as Record<string, unknown>)["aria-describedby"],
+            errorId,
+          ]
+            .filter(Boolean)
+            .join(" "),
+        })
+      : children;
+
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
       <label htmlFor={htmlFor} className="text-[14px] font-medium text-ink">
         {label}
       </label>
-      {children}
+      {control}
       {error ? (
-        <p id={htmlFor ? `${htmlFor}-error` : undefined} className="text-micro text-error">
+        <p id={errorId} className="text-micro text-error">
           {error}
         </p>
       ) : hint ? (

@@ -1,6 +1,7 @@
 "use client";
 
 import { create } from "zustand";
+import { X } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 export type ToastTone = "default" | "success" | "warning" | "error";
@@ -76,9 +77,9 @@ export function ToastViewport() {
               type="button"
               aria-label="Dismiss notification"
               onClick={() => dismiss(t.id)}
-              className="text-micro text-muted transition-colors hover:text-ink"
+              className="-m-1 flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-pill text-muted transition-colors hover:text-ink"
             >
-              ✕
+              <X size={14} aria-hidden />
             </button>
           </div>
         </div>

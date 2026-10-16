@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Bell, ChevronDown, LogOut, Search, WifiOff } from "lucide-react";
+import { Bell, ChevronDown, LogOut, Menu, Search, WifiOff } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { IconButton } from "@/components/ui/icon-button";
 import { useSession } from "@/lib/session/session-store";
 import { useLive } from "@/lib/hooks/use-live";
 import { db } from "@/lib/db/dexie";
@@ -65,7 +66,7 @@ function ScopeSwitcher() {
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-haspopup="listbox"
-        className="flex cursor-pointer items-center gap-2 rounded-pill border border-hairline bg-white px-3.5 py-1.5 text-[13px] text-ink transition-colors hover:border-primary"
+        className="flex min-h-11 cursor-pointer items-center gap-2 rounded-pill border border-hairline bg-white px-3.5 py-1.5 text-[13px] text-ink transition-colors hover:border-primary"
       >
         <span className="mono-label text-muted">Scope</span>
         <span>{current ? `${current.code} — ${current.name}` : "All stations"}</span>
@@ -74,7 +75,7 @@ function ScopeSwitcher() {
       {open && (
         <div
           role="listbox"
-          className="absolute left-0 z-50 mt-2 w-72 rounded-sm border border-hairline bg-white py-1"
+          className="absolute left-0 z-50 mt-2 max-h-[60vh] w-[min(18rem,calc(100vw-2rem))] overflow-y-auto scrollbar-slim rounded-sm border border-hairline bg-white py-1"
         >
           <button
             type="button"
@@ -135,7 +136,7 @@ function ProfileMenu() {
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-haspopup="menu"
-        className="flex cursor-pointer items-center gap-2 rounded-pill border border-transparent py-1 pr-2 pl-1 transition-colors hover:border-hairline"
+        className="flex min-h-11 cursor-pointer items-center gap-2 rounded-pill border border-transparent py-1 pr-2 pl-1 transition-colors hover:border-hairline"
       >
         <span className="flex size-8 items-center justify-center rounded-full bg-primary text-micro text-on-primary">
           {initials}
@@ -186,14 +187,13 @@ export function Topbar({
   return (
     <header className="sticky top-0 z-40 border-b border-hairline bg-white/95 backdrop-blur">
       <div className="flex h-14 items-center gap-3 px-4 lg:px-6">
-        <button
-          type="button"
+        <IconButton
           onClick={onOpenMenu}
           aria-label="Open navigation"
-          className="flex size-9 cursor-pointer items-center justify-center rounded-pill border border-hairline lg:hidden"
+          className="lg:hidden"
         >
-          ☰
-        </button>
+          <Menu size={18} aria-hidden />
+        </IconButton>
 
         <Link href="/dashboard" className="display-tight text-[22px] text-primary">
           FuelOps
@@ -213,7 +213,7 @@ export function Topbar({
           <button
             type="button"
             onClick={onOpenPalette}
-            className="hidden cursor-pointer items-center gap-2 rounded-pill border border-hairline px-3 py-1.5 text-[13px] text-muted transition-colors hover:border-primary hover:text-ink sm:flex"
+            className="hidden min-h-11 cursor-pointer items-center gap-2 rounded-pill border border-hairline px-3 py-1.5 text-[13px] text-muted transition-colors hover:border-primary hover:text-ink sm:flex"
             aria-label="Open command palette"
           >
             <Search size={14} aria-hidden /> Search
@@ -223,7 +223,7 @@ export function Topbar({
           <Link
             href="/alerts"
             aria-label={`Alerts${unacked ? `, ${unacked} unread` : ""}`}
-            className="relative flex size-9 cursor-pointer items-center justify-center rounded-pill border border-hairline text-ink transition-colors hover:border-primary"
+            className="relative flex size-11 cursor-pointer items-center justify-center rounded-pill border border-hairline text-ink transition-colors hover:border-primary"
           >
             <Bell size={16} strokeWidth={1.5} aria-hidden />
             {unacked > 0 && (

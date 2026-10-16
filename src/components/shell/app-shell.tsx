@@ -1,9 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { X } from "lucide-react";
 import { Topbar } from "./topbar";
 import { Sidebar } from "./sidebar";
 import { CommandPalette } from "./command-palette";
+import { IconButton } from "@/components/ui/icon-button";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -53,14 +55,12 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="absolute inset-y-0 left-0 w-64 border-r border-hairline bg-white">
             <div className="flex h-14 items-center justify-between border-b border-hairline px-4">
               <span className="display-tight text-[20px] text-primary">FuelOps</span>
-              <button
-                type="button"
+              <IconButton
                 aria-label="Close navigation"
                 onClick={() => setMenuOpen(false)}
-                className="size-9 cursor-pointer rounded-pill border border-hairline"
               >
-                ✕
-              </button>
+                <X size={18} aria-hidden />
+              </IconButton>
             </div>
             <Sidebar onNavigate={() => setMenuOpen(false)} />
           </div>

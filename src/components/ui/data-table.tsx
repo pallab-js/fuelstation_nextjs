@@ -63,8 +63,9 @@ export function DataTable<T>({
   }
 
   return (
-    <div className={cn("w-full overflow-x-auto scrollbar-slim", className)}>
-      <table className="w-full border-collapse whitespace-nowrap text-[15px]">
+    <div className="relative">
+      <div className={cn("w-full overflow-x-auto scrollbar-slim", className)}>
+        <table className="w-full border-collapse whitespace-nowrap text-[15px]">
         <thead>
           <tr className="border-b border-hairline">
             {columns.map((c) => {
@@ -129,7 +130,14 @@ export function DataTable<T>({
             </tr>
           ))}
         </tbody>
-      </table>
+        </table>
+      </div>
+      {/* Mobile scroll affordance: signals horizontally-scrollable columns.
+          Hidden on lg where tables fit; pointer-events-none so it never blocks. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white to-transparent lg:hidden"
+      />
     </div>
   );
 }

@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.1.6 — 2026-10-16
+
+UI mobile + consistency pass (from a UI/responsiveness review).
+
+- **Touch targets (WCAG 2.5.5/2.5.8):** new `IconButton` primitive with a
+  guaranteed 44×44px hit area; POS cart steppers and inventory stock steppers
+  raised 32 → 44px; topbar bell / scope / search / profile controls raised to a
+  44px minimum.
+- **Icon consistency:** raw `☰` / `✕` text glyphs replaced with lucide
+  `Menu` / `X` across the topbar, mobile nav drawer and toasts (consistent stroke
+  weight; no platform emoji-font fallback).
+- **Button system:** decoupled `size` from `variant` — the `size` prop is now
+  always honoured (`sm`/`md`/`lg` map to real min-heights) and the corner radius is
+  unified to pill. Previously `outline`/`secondary` silently overrode size and
+  radius, so buttons sharing a dialog footer rendered at different heights/shapes.
+- **Responsiveness:** scope-switcher dropdown clamped to `max-h-[60vh]` with
+  internal scroll and a viewport-aware width so it can't overflow a 375px screen;
+  `DataTable` gains a right-edge gradient fade on mobile to signal
+  horizontally-scrollable columns.
+- **Accessibility:** `Field` now wires `aria-invalid` + `aria-describedby` from the
+  error message to its control, and invalid controls show a red border.
+- **Cleanup:** removed a dead identical-branch ternary on the sidebar alert badge.
+- Verified: lint / typecheck / 50 tests / build + service worker green.
+
 ## 0.1.5 — 2026-10-16
 
 Security remediation pass (findings from a source-level security assessment).

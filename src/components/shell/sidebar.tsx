@@ -38,12 +38,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
             <Icon size={18} strokeWidth={1.5} aria-hidden />
             <span className="flex-1">{item.label}</span>
             {item.href === "/alerts" && unacked > 0 && (
-              <span
-                className={cn(
-                  "flex min-w-5 items-center justify-center rounded-full px-1 text-micro",
-                  active ? "bg-coral text-primary" : "bg-coral text-primary",
-                )}
-              >
+              <span className="flex min-w-5 items-center justify-center rounded-full bg-coral px-1 text-micro text-primary">
                 {unacked}
               </span>
             )}

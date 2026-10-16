@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Droplet, Truck } from "lucide-react";
+import { Droplet, Minus, Plus, Truck } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Chip } from "@/components/ui/chip";
@@ -281,17 +281,17 @@ export default function InventoryPage() {
                           type="button"
                           aria-label={`Decrease ${i.name}`}
                           onClick={() => adjustStock(i.id, -1)}
-                          className="size-8 cursor-pointer rounded-pill border border-hairline hover:border-error hover:text-error"
+                          className="flex size-11 cursor-pointer items-center justify-center rounded-pill border border-hairline hover:border-error hover:text-error"
                         >
-                          −
+                          <Minus size={16} aria-hidden />
                         </button>
                         <button
                           type="button"
                           aria-label={`Increase ${i.name}`}
                           onClick={() => adjustStock(i.id, 1)}
-                          className="size-8 cursor-pointer rounded-pill border border-hairline hover:border-deep-green hover:text-deep-green"
+                          className="flex size-11 cursor-pointer items-center justify-center rounded-pill border border-hairline hover:border-deep-green hover:text-deep-green"
                         >
-                          +
+                          <Plus size={16} aria-hidden />
                         </button>
                       </div>
                     </td>

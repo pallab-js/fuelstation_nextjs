@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useMemo, useState } from "react";
-import { Delete, Printer, Receipt as ReceiptIcon, Search } from "lucide-react";
+import { Delete, Minus, Plus, Printer, Receipt as ReceiptIcon, Search } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Chip } from "@/components/ui/chip";
 import { Dialog } from "@/components/ui/dialog";
+import { IconButton } from "@/components/ui/icon-button";
 import { Field, Input, Select } from "@/components/ui/field";
 import { EmptyState, Skeleton } from "@/components/ui/misc";
 import { PillGroup } from "@/components/ui/pill-group";
@@ -403,24 +404,20 @@ function PosInner() {
                           </p>
                         </div>
                         <div className="flex shrink-0 items-center gap-1.5">
-                          <button
-                            type="button"
+                          <IconButton
                             aria-label={`Remove one ${i.name}`}
                             onClick={() => setCart((c) => ({ ...c, [i.id]: Math.max(0, (c[i.id] ?? 0) - 1) }))}
-                            className="size-8 cursor-pointer rounded-pill border border-hairline hover:border-primary"
                           >
-                            −
-                          </button>
+                            <Minus size={16} aria-hidden />
+                          </IconButton>
                           <span className="w-7 text-center font-mono text-[15px] tabular-nums">{qty}</span>
-                          <button
-                            type="button"
+                          <IconButton
                             aria-label={`Add one ${i.name}`}
                             disabled={qty >= i.stockQty}
                             onClick={() => setCart((c) => ({ ...c, [i.id]: (c[i.id] ?? 0) + 1 }))}
-                            className="size-8 cursor-pointer rounded-pill border border-hairline hover:border-primary disabled:opacity-40"
                           >
-                            +
-                          </button>
+                            <Plus size={16} aria-hidden />
+                          </IconButton>
                         </div>
                       </li>
                     );
