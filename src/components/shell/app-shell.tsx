@@ -26,9 +26,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen flex-col bg-canvas">
-      <div className="no-print">
-        <Topbar onOpenMenu={() => setMenuOpen(true)} onOpenPalette={togglePalette} />
-      </div>
+      <Topbar onOpenMenu={() => setMenuOpen(true)} onOpenPalette={togglePalette} />
 
       <div className="flex min-h-0 flex-1">
         <div className="no-print sticky top-14 hidden h-[calc(100vh-3.5rem)] shrink-0 self-start overflow-y-auto scrollbar-slim lg:flex">

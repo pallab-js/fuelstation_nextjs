@@ -185,7 +185,7 @@ export function Topbar({
   const unacked = alerts.filter((a) => !a.acked).length;
 
   return (
-    <header className="sticky top-0 z-40 border-b border-hairline bg-white/95 backdrop-blur">
+    <header className="no-print sticky top-0 z-40 border-b border-hairline bg-white/95 backdrop-blur">
       <div className="flex h-14 items-center gap-3 px-4 lg:px-6">
         <IconButton
           onClick={onOpenMenu}

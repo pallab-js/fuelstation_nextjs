@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.11 — 2026-10-16
+
+Fix: top bar scrolled out of view.
+
+- The top bar was `sticky top-0` but nested in a wrapper `<div>` only as tall as the
+  bar itself, so it could not stick beyond that box and scrolled away immediately.
+  Removed the wrapper (moving `no-print` onto the `<header>`) so the sticky top bar
+  is a direct child of the full-height scroll column and now stays pinned across the
+  whole scroll — matching the already-sticky sidebar beneath it.
+- Verified: lint / typecheck / 50 tests / build green.
+
 ## 0.1.10 — 2026-10-16
 
 Dev-server quality-of-life.
