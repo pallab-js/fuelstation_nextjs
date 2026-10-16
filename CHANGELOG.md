@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.10 — 2026-10-16
+
+Dev-server quality-of-life.
+
+- Added `allowedDevOrigins` to `next.config.ts` so `next dev` resources (HMR) can
+  be reached from other devices on the LAN — e.g. opening the app on a phone/tablet
+  at `http://192.168.x.x:3000` to test the mobile touch-target work. Dev-only;
+  ignored by the `output: "export"` production build, so the deployed artifact is
+  unchanged (verified: `next build` still compiles).
+
 ## 0.1.9 — 2026-10-16
 
 Fix: desktop sidebar scrolled out of view with the page.
