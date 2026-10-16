@@ -31,7 +31,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </div>
 
       <div className="flex min-h-0 flex-1">
-        <div className="no-print hidden lg:flex lg:shrink-0">
+        <div className="no-print sticky top-14 hidden h-[calc(100vh-3.5rem)] shrink-0 self-start overflow-y-auto scrollbar-slim lg:flex">
           <Sidebar />
         </div>
 

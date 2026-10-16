@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.9 — 2026-10-16
+
+Fix: desktop sidebar scrolled out of view with the page.
+
+- The sidebar was a plain flex child in the body scroll flow, so it scrolled away
+  with the page content. It is now `sticky` beneath the 56px top bar
+  (`top-14`, `self-start` to escape flex stretch, with its own
+  `overflow-y-auto` guard), so it stays fixed while only the main page view
+  scrolls.
+- Verified: lint / typecheck / build + service worker green.
+
 ## 0.1.8 — 2026-10-16
 
 Localise the demo dataset to an Assam-based business.
